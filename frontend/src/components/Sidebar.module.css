@@ -1,0 +1,21 @@
+.sidebar{width:220px;flex-shrink:0;background:var(--white);border-right:1px solid var(--gray-200);display:flex;flex-direction:column;min-height:100vh;position:sticky;top:0;height:100vh;overflow-y:auto}
+.logo{display:flex;align-items:center;gap:10px;padding:20px 18px 16px;border-bottom:1px solid var(--gray-100)}
+.logoIcon{width:34px;height:34px;border-radius:9px;background:var(--green);color:white;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logoName{font-size:15px;font-weight:700;color:var(--gray-900)}
+.logoSub{font-size:11px;color:var(--gray-400);margin-top:1px}
+.nav{padding:12px 0}
+.navSection{padding:8px 18px 4px;font-size:10px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.07em}
+.navItem{display:flex;align-items:center;gap:10px;width:100%;padding:9px 18px;border:none;background:none;font-size:13.5px;color:var(--gray-600);text-align:left;transition:all .12s;cursor:pointer}
+.navItem:hover{background:var(--gray-50);color:var(--gray-900)}
+.navItem.active{background:var(--green-light);color:var(--green-dark);font-weight:600}
+.navIcon{font-size:16px;width:20px;text-align:center}
+.examSection{padding:12px 0;border-top:1px solid var(--gray-100)}
+.examBadge{display:flex;align-items:center;gap:8px;padding:7px 18px;font-size:13px;color:var(--gray-600)}
+.examDot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.userArea{margin-top:auto;display:flex;align-items:center;gap:10px;padding:14px 18px;border-top:1px solid var(--gray-100)}
+.avatar{width:34px;height:34px;border-radius:50%;background:#dbeafe;color:#1d4ed8;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.userInfo{flex:1;min-width:0}
+.userName{font-size:13px;font-weight:600;color:var(--gray-800);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.userTarget{font-size:11px;color:var(--gray-400);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.logoutBtn{background:none;border:1px solid var(--gray-200);border-radius:6px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--gray-400);flex-shrink:0;transition:all .12s}
+.logoutBtn:hover{background:var(--red-light);border-color:#fca5a5;color:var(--red)}

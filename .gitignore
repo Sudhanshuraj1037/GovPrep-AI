@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+
+# Environment Variables
+.env
+backend/.env
+
+# React Build
+frontend/build/
+
+# Uploaded PDFs
+backend/uploads/
+
+# Logs
+*.log
+
+# VS Code
+.vscode/
+
+# Database (optional if you don't want demo data)
+# govprep-db.json

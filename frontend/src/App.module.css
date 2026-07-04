@@ -1,0 +1,10 @@
+.app{display:flex;min-height:100vh}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow-x:hidden}
+.topbar{background:var(--white);border-bottom:1px solid var(--gray-200);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;gap:16px}
+.pageTitle{font-size:18px;font-weight:700;color:var(--gray-900)}
+.topbarRight{display:flex;align-items:center;gap:12px}
+.userBadge{font-size:13px;color:var(--gray-600);background:var(--gray-100);padding:5px 12px;border-radius:20px;font-weight:500}
+.btnPrimary{background:var(--green);color:white;border:none;padding:8px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;transition:background .15s}
+.btnPrimary:hover{background:var(--green-dark)}
+.content{flex:1;padding:28px;max-width:1200px;width:100%;margin:0 auto}
+.loading{display:flex;align-items:center;justify-content:center;min-height:100vh;gap:10px;font-size:16px;color:var(--gray-500)}

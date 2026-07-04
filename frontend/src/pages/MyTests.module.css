@@ -1,0 +1,43 @@
+.page{display:flex;flex-direction:column;gap:28px}
+.header{}
+.title{font-size:22px;font-weight:700;color:var(--gray-900)}
+.sub{font-size:14px;color:var(--gray-500);margin-top:5px}
+.section{}
+.sectionHeader{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.sectionTitle{font-size:16px;font-weight:700;color:var(--gray-800);margin-bottom:14px}
+.sectionHeader .sectionTitle{margin-bottom:0}
+.uploadBtn{background:var(--green);color:white;border:none;padding:8px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer}
+.uploadBtn:hover{background:var(--green-dark)}
+.emptyBox{text-align:center;padding:50px 20px;background:var(--white);border-radius:var(--radius-lg);border:1.5px dashed var(--gray-300)}
+.emptyIcon{font-size:44px;margin-bottom:12px}
+.emptyTitle{font-size:16px;font-weight:700;color:var(--gray-700)}
+.emptySub{font-size:13px;color:var(--gray-400);margin-top:4px;margin-bottom:18px}
+.primaryBtn{background:var(--green);color:white;border:none;padding:10px 24px;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer}
+.primaryBtn:hover{background:var(--green-dark)}
+.loading{display:flex;align-items:center;gap:8px;padding:24px;color:var(--gray-500);font-size:14px}
+.tableWrap{background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--gray-200);overflow:hidden;box-shadow:var(--shadow-sm)}
+.tableHead{display:grid;grid-template-columns:2fr 120px 80px 130px 140px;padding:10px 20px;background:var(--gray-50);border-bottom:1px solid var(--gray-200);font-size:11px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.05em}
+.tableRow{display:grid;grid-template-columns:2fr 120px 80px 130px 140px;padding:14px 20px;border-bottom:1px solid var(--gray-100);align-items:center}
+.tableRow:last-child{border-bottom:none}
+.tableRow:hover{background:var(--gray-50)}
+.fileCell{display:flex;align-items:center;gap:12px;min-width:0}
+.fileIcon{font-size:22px;flex-shrink:0}
+.fileName{font-size:13px;font-weight:600;color:var(--gray-800);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fileMeta{font-size:11px;color:var(--gray-400);margin-top:2px}
+.subjectBadge{display:inline-block;padding:3px 10px;border-radius:20px;background:#dbeafe;color:#1d4ed8;font-size:11px;font-weight:600}
+.pages{font-size:13px;color:var(--gray-600);font-weight:500}
+.date{font-size:12px;color:var(--gray-400)}
+.genBtn{background:var(--green-light);color:var(--green-dark);border:1px solid var(--green-mid);padding:7px 14px;border-radius:var(--radius-sm);font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .12s}
+.genBtn:hover{background:var(--green-mid)}
+.tableHeadTest{display:grid;grid-template-columns:2fr 100px 80px 80px 80px 80px;padding:10px 20px;background:var(--gray-50);border-bottom:1px solid var(--gray-200);font-size:11px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.05em}
+.tableRowTest{display:grid;grid-template-columns:2fr 100px 80px 80px 80px 80px;padding:14px 20px;border-bottom:1px solid var(--gray-100);align-items:center;font-size:13px}
+.tableRowTest:last-child{border-bottom:none}
+.tableRowTest:hover{background:var(--gray-50)}
+.testPdf{font-size:13px;font-weight:600;color:var(--gray-800);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.testTemplate{font-size:11px;color:var(--gray-400);margin-top:2px}
+.infoSection{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.infoCard{background:var(--white);border-radius:var(--radius);border:1px solid var(--gray-200);padding:22px;display:flex;flex-direction:column;gap:10px;box-shadow:var(--shadow-sm)}
+.infoIcon{font-size:28px}
+.infoTitle{font-size:14px;font-weight:700;color:var(--gray-800)}
+.infoText{font-size:13px;color:var(--gray-500);line-height:1.6}
+@media(max-width:800px){.tableHead,.tableRow{grid-template-columns:1fr 80px 100px}.tableHead>div:nth-child(3),.tableHead>div:nth-child(4),.tableRow>div:nth-child(3),.tableRow>div:nth-child(4){display:none}.tableHeadTest,.tableRowTest{grid-template-columns:2fr 80px 60px 60px}.tableHeadTest>div:nth-child(5),.tableHeadTest>div:nth-child(6),.tableRowTest>div:nth-child(5),.tableRowTest>div:nth-child(6){display:none}.infoSection{grid-template-columns:1fr}}
