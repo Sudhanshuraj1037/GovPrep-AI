@@ -1,6 +1,6 @@
 // api.js — All API calls in one place, automatically attaches JWT token
 
-const BASE = "";
+const BASE = "https://govprep-backend-pkn9.onrender.com";
 
 function getToken() { return localStorage.getItem("govprep_token"); }
 export function setToken(t) { localStorage.setItem("govprep_token", t); }
