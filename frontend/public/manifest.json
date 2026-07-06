@@ -1,0 +1,17 @@
+{
+  "short_name": "GovPrep AI",
+  "name": "GovPrep AI – Exam Preparation",
+  "description": "AI-powered exam preparation for Railway, SSC, UPSC, Banking aspirants",
+  "icons": [
+    { "src": "icon-192.png", "type": "image/png", "sizes": "192x192", "purpose": "any maskable" },
+    { "src": "icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "any maskable" }
+  ],
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#1a9e75",
+  "background_color": "#f9fafb",
+  "categories": ["education", "productivity"],
+  "lang": "en-IN"
+}

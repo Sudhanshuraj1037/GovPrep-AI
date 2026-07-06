@@ -1,0 +1,11 @@
+.banner{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 20px;background:linear-gradient(135deg,var(--green),var(--green-dark));color:white;flex-wrap:wrap}
+.left{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
+.icon{font-size:24px;flex-shrink:0}
+.title{font-size:14px;font-weight:700}
+.sub{font-size:12px;opacity:.85;margin-top:2px}
+.actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.installBtn{background:white;color:var(--green-dark);border:none;padding:8px 18px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+.installBtn:hover{opacity:.9}
+.dismissBtn{background:rgba(255,255,255,.2);border:none;color:white;width:28px;height:28px;border-radius:50%;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dismissBtn:hover{background:rgba(255,255,255,.3)}
+@media(max-width:480px){.sub{display:none}.banner{padding:10px 14px}}

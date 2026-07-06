@@ -1,10 +1,68 @@
-.app{display:flex;min-height:100vh}
+.app{display:flex;min-height:100vh;background:var(--bg-secondary)}
 .main{flex:1;display:flex;flex-direction:column;min-width:0;overflow-x:hidden}
-.topbar{background:var(--white);border-bottom:1px solid var(--gray-200);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;gap:16px}
-.pageTitle{font-size:18px;font-weight:700;color:var(--gray-900)}
-.topbarRight{display:flex;align-items:center;gap:12px}
-.userBadge{font-size:13px;color:var(--gray-600);background:var(--gray-100);padding:5px 12px;border-radius:20px;font-weight:500}
-.btnPrimary{background:var(--green);color:white;border:none;padding:8px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;transition:background .15s}
+
+/* Mobile overlay behind open sidebar */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:90}
+
+.topbar{
+  background:var(--topbar-bg);border-bottom:1px solid var(--border-color);
+  padding:12px 20px;display:flex;align-items:center;
+  position:sticky;top:0;z-index:50;gap:10px;min-height:56px;
+  transition:background .25s,border-color .25s;
+}
+.pageTitle{font-size:17px;font-weight:700;color:var(--text-primary);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbarRight{display:flex;align-items:center;gap:8px;flex-shrink:0}
+
+/* Hamburger — hidden on desktop, shown on mobile */
+.hamburger{
+  display:none;background:none;border:none;font-size:22px;
+  color:var(--text-primary);padding:4px 8px;border-radius:6px;
+  flex-shrink:0;line-height:1;cursor:pointer;
+}
+.hamburger:hover{background:var(--hover-bg)}
+
+.themeBtn{
+  display:flex;align-items:center;gap:5px;padding:7px 12px;border-radius:20px;
+  border:1.5px solid var(--border-color);background:var(--bg-tertiary);
+  color:var(--text-secondary);font-size:13px;font-weight:600;
+  cursor:pointer;transition:all .2s;white-space:nowrap;
+}
+.themeBtn:hover{border-color:var(--green);background:var(--green-light);color:var(--green-dark)}
+.themeBtnLabel{font-size:12px}
+
+.userBadge{
+  font-size:12px;font-weight:500;color:var(--text-muted);
+  background:var(--bg-tertiary);padding:5px 10px;border-radius:20px;
+  border:1px solid var(--border-color);white-space:nowrap;
+}
+.btnPrimary{
+  background:var(--green);color:white;border:none;
+  padding:8px 16px;border-radius:var(--radius-sm);
+  font-size:13px;font-weight:600;transition:background .15s;white-space:nowrap;
+}
 .btnPrimary:hover{background:var(--green-dark)}
-.content{flex:1;padding:28px;max-width:1200px;width:100%;margin:0 auto}
-.loading{display:flex;align-items:center;justify-content:center;min-height:100vh;gap:10px;font-size:16px;color:var(--gray-500)}
+
+.content{flex:1;padding:24px;max-width:1200px;width:100%;margin:0 auto}
+.loading{display:flex;align-items:center;justify-content:center;min-height:100vh;gap:10px;font-size:16px;color:var(--text-muted);background:var(--bg-secondary)}
+
+/* Global dark-mode overrides */
+:global([data-theme="dark"]) input,:global([data-theme="dark"]) select,:global([data-theme="dark"]) textarea{
+  background:var(--input-bg)!important;color:var(--text-primary)!important;border-color:var(--border-color)!important;
+}
+:global([data-theme="dark"]) input::placeholder{color:var(--text-faint)!important}
+:global([data-theme="dark"]) ::-webkit-scrollbar-track{background:var(--bg-primary)}
+:global([data-theme="dark"]) ::-webkit-scrollbar-thumb{background:var(--scrollbar-thumb)}
+
+/* === MOBILE === */
+@media(max-width:768px){
+  .hamburger{display:flex;align-items:center;justify-content:center}
+  .topbar{padding:10px 14px;gap:8px}
+  .pageTitle{font-size:15px}
+  .themeBtnLabel{display:none}
+  .themeBtn{padding:7px 9px}
+  .userBadge{display:none}
+  .content{padding:14px}
+}
+@media(max-width:480px){
+  .btnPrimary{padding:7px 12px;font-size:12px}
+}

@@ -3,20 +3,21 @@ import styles from './Sidebar.module.css';
 
 const navItems = [
   { id: 'dashboard', icon: '⊞', label: 'Dashboard' },
-  { id: 'upload', icon: '↑', label: 'Upload PDF' },
-  { id: 'generate', icon: '✦', label: 'Generate Test' },
-  { id: 'my-tests', icon: '☑', label: 'My Tests' },
+  { id: 'upload',    icon: '↑',  label: 'Upload PDF' },
+  { id: 'generate',  icon: '✦',  label: 'Generate Test' },
+  { id: 'my-tests',  icon: '☑',  label: 'My Tests' },
 ];
 
-export default function Sidebar({ page, navigate, user, onLogout }) {
+export default function Sidebar({ page, navigate, user, onLogout, isOpen, onClose }) {
   return (
-    <aside className={styles.sidebar}>
+    <aside className={`${styles.sidebar} ${isOpen ? styles.open : ''}`}>
       <div className={styles.logo}>
         <div className={styles.logoIcon}>G</div>
         <div>
           <div className={styles.logoName}>GovPrep AI</div>
           <div className={styles.logoSub}>Exam Intelligence</div>
         </div>
+        <button className={styles.closeBtn} onClick={onClose} aria-label="Close menu">✕</button>
       </div>
 
       <nav className={styles.nav}>
@@ -38,7 +39,7 @@ export default function Sidebar({ page, navigate, user, onLogout }) {
         {[
           { label: 'Railway', color: '#2563eb' },
           { label: 'SSC CGL', color: '#16a34a' },
-          { label: 'UPSC', color: '#7c3aed' },
+          { label: 'UPSC',    color: '#7c3aed' },
           { label: 'Banking', color: '#d97706' },
         ].map(e => (
           <div key={e.label} className={styles.examBadge}>
@@ -49,7 +50,7 @@ export default function Sidebar({ page, navigate, user, onLogout }) {
       </div>
 
       <div className={styles.userArea}>
-        <div className={styles.avatar}>{user?.name?.slice(0, 2).toUpperCase() || 'US'}</div>
+        <div className={styles.avatar}>{user?.name?.slice(0,2).toUpperCase() || 'US'}</div>
         <div className={styles.userInfo}>
           <div className={styles.userName}>{user?.name || 'User'}</div>
           <div className={styles.userTarget}>{user?.examTarget || 'Aspirant'}</div>
