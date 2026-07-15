@@ -106,8 +106,6 @@ GovPrep AI can be installed directly on your device without downloading it from 
 
 # 📸 Application Preview
 
-# 📸 Screenshots
-
 ## 🔐 Authentication
 
 <p align="center">
