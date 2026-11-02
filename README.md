@@ -285,6 +285,28 @@ JWT_SECRET=YOUR_SECRET_KEY
 PORT=5000
 ```
 
+A complete template is in `backend/.env.example` (copy it to `backend/.env`). It also documents the optional
+`NLP_SERVICE_URL` settings described in the next section.
+
+---
+
+# 🧠 NLP Service (optional)
+
+GovPrep-AI also includes a Python NLP/Deep Learning service (`nlp_service/`: TF-IDF, Word2Vec, LSTM, BiLSTM, BERT and a
+model comparison). The backend proxies it, behind the normal login, at `/api/nlp/*`. It is optional: without
+`NLP_SERVICE_URL` those routes answer `503` and every other feature works exactly as before. The React app does not use
+it yet.
+
+```bash
+# terminal 1
+cd nlp_service && python -m uvicorn app.main:app --host 127.0.0.1 --port 8001
+# terminal 2
+cd backend && npm start        # with NLP_SERVICE_URL=http://127.0.0.1:8001 in backend/.env
+```
+
+Setup, every route, the error contract, tests and the repository hygiene tool are documented in
+[`docs/NLP_INTEGRATION.md`](docs/NLP_INTEGRATION.md).
+
 ---
 
 # 🌍 Live Deployment

@@ -1,6 +1,10 @@
 // api.js — All API calls in one place, automatically attaches JWT token
 
-const BASE = "https://govprep-backend-pkn9.onrender.com";
+const BASE =
+  process.env.REACT_APP_API_URL ||
+  (typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
+    ? "http://localhost:5000"
+    : "https://govprep-backend-pkn9.onrender.com");
 
 function getToken() { return localStorage.getItem("govprep_token"); }
 export function setToken(t) { localStorage.setItem("govprep_token", t); }

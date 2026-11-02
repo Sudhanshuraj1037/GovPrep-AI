@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+.venv-nlp/
+.env
+
+# Data: keep folder structure, not the (large / licensed) datasets
+data/public/*
+data/pdf_heldout/*
+data/processed/*
+!data/**/.gitkeep
+!data/public/SOURCES.md
+
+# Model weights are large and reproducible; metrics/plots are small and are kept.
+artifacts/**/*.pt
+artifacts/**/*.pth
+artifacts/**/*.bin
+artifacts/**/*.safetensors
+artifacts/**/*.model
+artifacts/**/*.model.*
+artifacts/**/*.joblib

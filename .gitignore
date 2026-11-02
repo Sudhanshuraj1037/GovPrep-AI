@@ -17,5 +17,34 @@ backend/uploads/
 # VS Code
 .vscode/
 
-# Database (optional if you don't want demo data)
-# govprep-db.json
+# Local database: holds user accounts (password hashes), extracted PDF text and
+# test history. Never commit it. database.js recreates an empty one on first run.
+backend/govprep-db.json
+backend/govprep-db.json.*
+govprep-db.json
+
+# Python virtual environments / caches (repo-level .venv and nlp_service/.venv-nlp)
+.venv/
+.venv-nlp/
+__pycache__/
+*.pyc
+# --- Local-only and generated files that must never be committed (enforced by scripts/repo-hygiene.js) ---
+# Backups made by: node scripts/repo-hygiene.js fix --apply
+.hygiene-backup/
+
+# Other environment files; templates named .env.example are committed on purpose
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+
+# Plain virtualenv name (.venv/ and .venv-nlp/ are above)
+venv/
+
+# Generated NLP model weights (metrics.json, tokenizer/ and comparison reports are small and may be committed)
+*.pt
+*.pth
+*.joblib
+*.safetensors
+*.ckpt
+*.onnx

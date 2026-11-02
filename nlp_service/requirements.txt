@@ -1,0 +1,28 @@
+# Service
+fastapi>=0.110
+uvicorn[standard]>=0.29
+pydantic>=2.6
+pydantic-settings>=2.2
+
+# Phase 2: NLP preprocessing + TF-IDF baseline
+numpy>=1.26
+pandas>=2.1
+scikit-learn>=1.4
+nltk>=3.8.1
+joblib>=1.3
+
+# Phase 3: Word2Vec (CBOW / Skip-Gram); PCA and t-SNE come from scikit-learn above
+gensim>=4.3
+
+# Phase 4: LSTM (PyTorch). Only the LSTM trainer and /classify/lstm need it; the rest of the
+# service (including /health) runs without it. A CPU build is enough for development:
+#   Windows / macOS : pip install torch
+#   Linux CPU-only  : pip install torch --index-url https://download.pytorch.org/whl/cpu
+torch>=2.2
+
+# Phase 5: BiLSTM reuses torch (no new package).
+
+# Phase 6: BERT fine-tuning (Hugging Face Transformers + PyTorch). Imported lazily: only training and
+# /classify/bert need it. Tested with transformers 5.19; the default checkpoint is downloaded from the
+# Hugging Face Hub on first use (internet needed) unless --pretrained points to a local directory.
+transformers>=4.40

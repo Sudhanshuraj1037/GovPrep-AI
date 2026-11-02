@@ -9,11 +9,15 @@ const pdfParse = require("pdf-parse");
 const OpenAI = require("openai");
 const db = require("./database");
 const { hashPassword, verifyPassword, signToken, requireAuth } = require("./auth");
+const { createNlpRouter } = require("./nlp");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors());
+// NLP service proxy (authenticated). Mounted BEFORE express.json() because it needs its own, larger
+// JSON body limit; it still passes through cors() above. See docs/NLP_INTEGRATION.md.
+app.use("/api/nlp", createNlpRouter({ requireAuth }));
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
@@ -35,7 +39,7 @@ const upload = multer({
 
 if (!process.env.GROQ_API_KEY) console.warn("\n⚠️  GROQ_API_KEY not set in .env\n");
 const groq = new OpenAI({ apiKey: process.env.GROQ_API_KEY, baseURL: "https://api.groq.com/openai/v1" });
-const GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
+const GROQ_MODEL = process.env.GROQ_MODEL || "openai/gpt-oss-20b";
 
 // ── Helpers ──────────────────────────────────────────────────
 function splitIntoPages(rawText, totalPages) {
@@ -154,7 +158,7 @@ app.get("/api/pdfs", requireAuth, (req, res) => {
 app.delete("/api/pdfs/:id", requireAuth, (req, res) => {
   const pdf = db.prepare("SELECT * FROM pdfs WHERE id=? AND user_id=?").get(req.params.id, req.userId);
   if (!pdf) return res.status(404).json({ error: "PDF not found" });
-  try { if (fs.existsSync(pdf.file_path)) fs.unlinkSync(pdf.file_path); } catch (_) {}
+  try { if (fs.existsSync(pdf.file_path)) fs.unlinkSync(pdf.file_path); } catch (_) { }
   db.prepare("DELETE FROM pdfs WHERE id=?").run(req.params.id);
   res.json({ success: true });
 });
@@ -293,8 +297,8 @@ app.post("/api/assistant/chat", requireAuth, async (req, res) => {
         ctxBlock = `\n\nStudent is asking about their PDF: "${pdf.name}" (${pdf.subject} - ${pdf.chapter}), pages ${s}-${e}.\nContent:\n---\n${slice}\n---\nAnswer from this content when the question is about the PDF.`;
       }
     } else if (context?.type === "question") {
-      const opts = (context.options || []).map((o, i) => `${["A","B","C","D"][i]}. ${o}`).join(" | ");
-      ctxBlock = `\n\nStudent is asking about this question they got wrong:\nQ: ${context.questionText}\nOptions: ${opts}\nCorrect answer: ${["A","B","C","D"][context.correctAnswer]}\nStudent's answer: ${context.userAnswer != null ? ["A","B","C","D"][context.userAnswer] : "Not answered"}\nExplanation on file: ${context.explanation || "None"}\nExplain clearly why the correct answer is right.`;
+      const opts = (context.options || []).map((o, i) => `${["A", "B", "C", "D"][i]}. ${o}`).join(" | ");
+      ctxBlock = `\n\nStudent is asking about this question they got wrong:\nQ: ${context.questionText}\nOptions: ${opts}\nCorrect answer: ${["A", "B", "C", "D"][context.correctAnswer]}\nStudent's answer: ${context.userAnswer != null ? ["A", "B", "C", "D"][context.userAnswer] : "Not answered"}\nExplanation on file: ${context.explanation || "None"}\nExplain clearly why the correct answer is right.`;
     }
   } catch (e) { console.error("Context error:", e); }
 

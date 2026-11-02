@@ -12,11 +12,22 @@ import AssistantWidget from './components/AssistantWidget';
 import InstallBanner from './components/InstallBanner';
 import styles from './App.module.css';
 
-// Register PWA service worker
+// Register PWA service worker only in production (in dev it aggressively caches JS bundles)
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
-  });
+  if (process.env.NODE_ENV === 'production') {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    });
+  } else {
+    navigator.serviceWorker.getRegistrations().then(regs => {
+      for (const reg of regs) reg.unregister();
+    });
+    if ('caches' in window) {
+      caches.keys().then(keys => {
+        for (const key of keys) caches.delete(key);
+      });
+    }
+  }
 }
 
 export default function App() {
