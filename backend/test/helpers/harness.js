@@ -175,10 +175,11 @@ function readFixturePdf() {
   return fs.readFileSync(FIXTURE_PDF);
 }
 
-async function uploadPdf(base, token, pdf, { name = "history-notes.pdf", subject = "History", chapter = "Ancient India", type = "application/pdf" } = {}) {
+async function uploadPdf(base, token, pdf, { name = "history-notes.pdf", subject = "History", chapter = "Ancient India", type = "application/pdf", subjectMode } = {}) {
   const form = new FormData();
   form.append("pdf", new Blob([pdf], { type }), name);
   form.append("subject", subject);
+  if (subjectMode) form.append("subjectMode", subjectMode);
   form.append("chapter", chapter);
   const res = await fetch(`${base}/api/upload`, { method: "POST", headers: { Authorization: `Bearer ${token}` }, body: form });
   const text = await res.text();

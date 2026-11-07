@@ -29,7 +29,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
 from .config import settings
-from .labels import DATA_COLUMNS, DIFFICULTIES, SUBJECTS
+from .labels import DATA_COLUMNS, DIFFICULTIES, OPTIONAL_COLUMNS, SUBJECTS
 
 DEFAULT_SEED = 42
 SPLIT_NAMES = ("train", "val", "test")
@@ -105,8 +105,9 @@ def load_dataset(path: str | Path) -> tuple[pd.DataFrame, dict[str, Any]]:
             f"Required schema: {DATA_COLUMNS}"
         )
 
-    df = raw[DATA_COLUMNS].copy()
-    for col in DATA_COLUMNS:
+    keep = DATA_COLUMNS + [c for c in OPTIONAL_COLUMNS if c in raw.columns]
+    df = raw[keep].copy()
+    for col in keep:
         df[col] = df[col].map(lambda v: _WS.sub(" ", v).strip())
 
     rows_read = len(df)
@@ -176,6 +177,7 @@ def stratified_split(
     test_size: float = 0.15,
     min_class_count: int = 5,
     stratify_on: str = "subject",
+    group_col: str | None = None,
 ) -> tuple[dict[str, pd.DataFrame], dict[str, Any]]:
     """Seeded stratified train/val/test split.
 
@@ -202,15 +204,21 @@ def stratified_split(
         )
 
     try:
-        rest, test = train_test_split(
-            df, test_size=test_size, stratify=df[stratify_on], random_state=seed
-        )
-        train, val = train_test_split(
-            rest,
-            test_size=val_size / (1.0 - test_size),
-            stratify=rest[stratify_on],
-            random_state=seed,
-        )
+        if group_col:
+            if group_col not in df.columns:
+                raise DataValidationError(f"group_col '{group_col}' is not a column of the data")
+            rest, test = _grouped_carve(df, test_size, seed, stratify_on, group_col)
+            train, val = _grouped_carve(rest, val_size / (1.0 - test_size), seed, stratify_on, group_col)
+        else:
+            rest, test = train_test_split(
+                df, test_size=test_size, stratify=df[stratify_on], random_state=seed
+            )
+            train, val = train_test_split(
+                rest,
+                test_size=val_size / (1.0 - test_size),
+                stratify=rest[stratify_on],
+                random_state=seed,
+            )
     except ValueError as exc:
         raise DataValidationError(
             f"Dataset too small to split with val_size={val_size}, test_size={test_size}: {exc}"
@@ -226,6 +234,7 @@ def stratified_split(
         "val_size": val_size,
         "test_size": test_size,
         "min_class_count": min_class_count,
+        "grouped_by": group_col,
         "dropped_small_classes": dropped,
         "sizes": {k: len(v) for k, v in splits.items()},
         "class_counts": {
@@ -234,6 +243,29 @@ def stratified_split(
         },
     }
     return splits, report
+
+
+def _grouped_carve(
+    df: pd.DataFrame, fraction: float, seed: int, stratify_on: str, group_col: str
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Split ``df`` into (rest, held) so that no group value appears on both sides.
+
+    Uses StratifiedGroupKFold: the held part is one fold of ``round(1/fraction)`` folds, so its
+    size is only approximately ``fraction`` and class proportions only approximately preserved.
+    All rows of a group (e.g. every question from one PDF) land on the same side.
+    """
+    from sklearn.model_selection import StratifiedGroupKFold
+
+    n_groups = df[group_col].nunique()
+    n_splits = max(2, int(round(1.0 / fraction)))
+    if n_groups < n_splits:
+        raise DataValidationError(
+            f"Only {n_groups} distinct '{group_col}' value(s); a grouped split into ~{fraction:.0%} "
+            f"needs at least {n_splits}. Use a random stratified split or collect more sources."
+        )
+    sgkf = StratifiedGroupKFold(n_splits=n_splits, shuffle=True, random_state=seed)
+    rest_idx, held_idx = next(sgkf.split(df, df[stratify_on], groups=df[group_col]))
+    return df.iloc[rest_idx], df.iloc[held_idx]
 
 
 def drop_leaked(
@@ -259,6 +291,7 @@ def prepare_splits(
     val_size: float = 0.15,
     test_size: float = 0.15,
     min_class_count: int = 5,
+    group_col: str | None = None,
 ) -> dict[str, Any]:
     """Validate the public CSV, split it, write ``processed/*.csv`` and a manifest.
 
@@ -274,6 +307,7 @@ def prepare_splits(
         val_size=val_size,
         test_size=test_size,
         min_class_count=min_class_count,
+        group_col=group_col,
     )
 
     out = processed_dir()

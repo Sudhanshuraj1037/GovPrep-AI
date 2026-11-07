@@ -10,6 +10,7 @@ const OpenAI = require("openai");
 const db = require("./database");
 const { hashPassword, verifyPassword, signToken, requireAuth } = require("./auth");
 const { createNlpRouter } = require("./nlp");
+const { detectDocumentSubject } = require("./nlp/documentClassifier");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -100,6 +101,38 @@ function groqErr(err) {
   return isRateLimit(err) ? `Groq free-tier daily limit reached. ${msg} Try again later.` : msg;
 }
 
+const APPLICATION_SUBJECTS = new Set([
+  "History", "Geography", "Mathematics", "Science", "Reasoning",
+  "General Awareness", "English", "Economics", "Polity", "Current Affairs", "Other", "General",
+]);
+
+function pdfDto(pdf) {
+  let subjectDetection = null;
+  try {
+    subjectDetection = pdf.subject_detection_details
+      ? JSON.parse(pdf.subject_detection_details)
+      : null;
+  } catch (_) { subjectDetection = null; }
+  const status = pdf.subject_detection_status || "manual_confirmed"; // legacy PDFs remain usable
+  return {
+    id: pdf.id,
+    name: pdf.name,
+    totalPages: pdf.total_pages,
+    subject: pdf.subject,
+    chapter: pdf.chapter,
+    wordCount: pdf.word_count,
+    uploadedAt: pdf.uploaded_at,
+    subjectDetectionStatus: status,
+    subjectDetected: pdf.subject_detected || null,
+    subjectDetectionModel: pdf.subject_detection_model || null,
+    subjectDetectionScore: pdf.subject_detection_score !== null && pdf.subject_detection_score !== undefined && Number.isFinite(Number(pdf.subject_detection_score)) ? Number(pdf.subject_detection_score) : null,
+    subjectManuallyOverridden: Boolean(pdf.subject_manually_overridden),
+    subjectDetectionReason: subjectDetection?.reasonCode || null,
+    subjectDetection,
+  };
+}
+
+
 // ════════════════════════════════════════════════════════════
 //  AUTH
 // ════════════════════════════════════════════════════════════
@@ -139,20 +172,105 @@ app.get("/api/auth/me", requireAuth, (req, res) => {
 app.post("/api/upload", requireAuth, upload.single("pdf"), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: "No PDF provided" });
-    const { subject = "General", chapter = "Chapter 1" } = req.body;
+    const chapter = String(req.body.chapter || "Chapter 1").trim().slice(0, 160) || "Chapter 1";
+    // Backward compatibility: older clients sent a subject and no mode, which is treated as manual.
+    const subjectMode = req.body.subjectMode || (req.body.subject ? "manual" : "auto");
+    if (!["auto", "manual"].includes(subjectMode)) {
+      try { fs.unlinkSync(req.file.path); } catch (_) { }
+      return res.status(400).json({ error: "subjectMode must be 'auto' or 'manual'." });
+    }
+    const requestedSubject = String(req.body.subject || "Other").trim();
+    if (subjectMode === "manual" && !APPLICATION_SUBJECTS.has(requestedSubject)) {
+      try { fs.unlinkSync(req.file.path); } catch (_) { }
+      return res.status(400).json({ error: "Please select a valid subject." });
+    }
+
     const buf = fs.readFileSync(req.file.path);
     const parsed = await pdfParse(buf);
-    const pageTexts = splitIntoPages(parsed.text, parsed.numpages);
+    const extractedText = String(parsed.text || "");
+    const pageTexts = splitIntoPages(extractedText, parsed.numpages || 1);
     const id = uuidv4();
-    db.prepare("INSERT INTO pdfs (id,user_id,name,file_path,text,page_texts,total_pages,subject,chapter,word_count,uploaded_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)")
-      .run(id, req.userId, req.file.originalname, req.file.path, parsed.text, JSON.stringify(pageTexts), parsed.numpages, subject, chapter, parsed.text.split(/\s+/).filter(Boolean).length, new Date().toISOString());
-    res.json({ success: true, pdf: { id, name: req.file.originalname, totalPages: parsed.numpages, subject, chapter, wordCount: parsed.text.split(/\s+/).filter(Boolean).length, uploadedAt: new Date().toISOString() } });
-  } catch (e) { console.error(e); res.status(500).json({ error: e.message || "Upload failed" }); }
+    const uploadedAt = new Date().toISOString();
+    let subject = requestedSubject;
+    let detection;
+
+    if (subjectMode === "auto") {
+      detection = await detectDocumentSubject(pageTexts);
+      if (detection.status === "awaiting_confirmation" && APPLICATION_SUBJECTS.has(detection.detectedSubject)) {
+        subject = detection.detectedSubject;
+      } else {
+        subject = "Other";
+      }
+      if (detection.status === "manual_required") {
+        console.warn(`[pdf] subject detection requires manual selection (${detection.reasonCode || "unknown"}); PDF upload retained.`);
+      }
+    } else {
+      detection = {
+        status: "manual_confirmed", model: null, detectedSubject: null, score: null,
+        margin: null, agreement: null, chunksAnalyzed: 0, pagesAnalyzed: [],
+        reasonCode: null, predictions: [],
+      };
+    }
+
+    const wordCount = extractedText.split(/\s+/).filter(Boolean).length;
+    const detectionAt = new Date().toISOString();
+    db.prepare("INSERT INTO pdfs (id,user_id,name,file_path,text,page_texts,total_pages,subject,chapter,word_count,uploaded_at,subject_detection_status,subject_detected,subject_detection_model,subject_detection_score,subject_detection_details,subject_manually_overridden,subject_detection_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
+      .run(
+        id, req.userId, req.file.originalname, req.file.path, extractedText, JSON.stringify(pageTexts),
+        parsed.numpages || pageTexts.length || 1, subject, chapter, wordCount, uploadedAt,
+        detection.status, detection.detectedSubject || null, detection.model || null,
+        Number.isFinite(detection.score) ? detection.score : null, JSON.stringify(detection), false, detectionAt,
+      );
+
+    res.json({
+      success: true,
+      pdf: {
+        id, name: req.file.originalname, totalPages: parsed.numpages || pageTexts.length || 1,
+        subject, chapter, wordCount, uploadedAt,
+        subjectDetectionStatus: detection.status,
+        subjectDetected: detection.detectedSubject || null,
+        subjectDetectionModel: detection.model || null,
+        subjectDetectionScore: Number.isFinite(detection.score) ? detection.score : null,
+        subjectManuallyOverridden: false,
+        subjectDetectionReason: detection.reasonCode || null,
+        subjectDetection: detection,
+      },
+    });
+  } catch (e) {
+    if (req.file?.path) { try { fs.unlinkSync(req.file.path); } catch (_) { } }
+    console.error("PDF upload failed:", e?.message || e);
+    res.status(500).json({ error: "PDF upload failed. Please try a valid text-based PDF." });
+  }
 });
 
 app.get("/api/pdfs", requireAuth, (req, res) => {
   const rows = db.prepare("SELECT id,name,total_pages,subject,chapter,word_count,uploaded_at FROM pdfs WHERE user_id=? ORDER BY uploaded_at DESC").all(req.userId);
-  res.json({ pdfs: rows.map(p => ({ id: p.id, name: p.name, totalPages: p.total_pages, subject: p.subject, chapter: p.chapter, wordCount: p.word_count, uploadedAt: p.uploaded_at })) });
+  res.json({ pdfs: rows.map(pdfDto) });
+});
+
+app.patch("/api/pdfs/:id/subject", requireAuth, (req, res) => {
+  const subject = typeof req.body?.subject === "string" ? req.body.subject.trim() : "";
+  if (!APPLICATION_SUBJECTS.has(subject)) return res.status(400).json({ error: "Please select a valid subject." });
+  const pdf = db.prepare("SELECT * FROM pdfs WHERE id=? AND user_id=?").get(req.params.id, req.userId);
+  if (!pdf) return res.status(404).json({ error: "PDF not found" });
+
+  const detected = pdf.subject_detected || null;
+  const confirmedPrediction = Boolean(detected && subject === detected);
+  const status = confirmedPrediction ? "confirmed" : "manual_confirmed";
+  const overridden = Boolean(detected && subject !== detected);
+  const details = (() => {
+    try { return pdf.subject_detection_details ? JSON.parse(pdf.subject_detection_details) : {}; }
+    catch (_) { return {}; }
+  })();
+  details.confirmation = { subject, status, manuallyOverridden: overridden, confirmedAt: new Date().toISOString() };
+  db.update("pdfs", (row) => row.id === req.params.id && row.user_id === req.userId, {
+    subject,
+    subject_detection_status: status,
+    subject_manually_overridden: overridden,
+    subject_detection_details: JSON.stringify(details),
+  });
+  const updated = db.prepare("SELECT * FROM pdfs WHERE id=? AND user_id=?").get(req.params.id, req.userId);
+  res.json({ success: true, pdf: pdfDto(updated) });
 });
 
 app.delete("/api/pdfs/:id", requireAuth, (req, res) => {
@@ -173,6 +291,15 @@ app.post("/api/generate-questions", requireAuth, async (req, res) => {
 
   const pdf = db.prepare("SELECT * FROM pdfs WHERE id=? AND user_id=?").get(pdfId, req.userId);
   if (!pdf) return res.status(404).json({ error: "PDF not found. Please upload first." });
+
+  if (["awaiting_confirmation", "manual_required"].includes(pdf.subject_detection_status)) {
+    return res.status(409).json({
+      error: "Please confirm or manually select this PDF's subject before generating questions.",
+      code: "subject_confirmation_required",
+      detectedSubject: pdf.subject_detected || null,
+      detectionStatus: pdf.subject_detection_status,
+    });
+  }
 
   const pages = JSON.parse(pdf.page_texts);
   const s = Math.max(1, parseInt(pageStart) || 1);
@@ -222,7 +349,7 @@ Output ONLY this JSON array:
     db.prepare("INSERT INTO tests (id,user_id,pdf_id,pdf_name,exam_template,page_start,page_end,questions_json,created_at) VALUES (?,?,?,?,?,?,?,?,?)")
       .run(testId, req.userId, pdfId, pdf.name, examTemplate, s, e, JSON.stringify(questions), new Date().toISOString());
 
-    res.json({ success: true, testId, questions, meta: { pdfName: pdf.name, subject: pdf.subject, chapter: pdf.chapter, pageRange: `${s}–${e}`, totalPages: pdf.total_pages, questionsGenerated: questions.length } });
+    res.json({ success: true, testId, questions, meta: { pdfName: pdf.name, subject: pdf.subject, chapter: pdf.chapter, pageRange: `${s}–${e}`, totalPages: pdf.total_pages, questionsGenerated: questions.length, subjectDetectionStatus: pdf.subject_detection_status || "manual_confirmed", subjectDetectionModel: pdf.subject_detection_model || null } });
   } catch (err) {
     console.error("Generation error:", err);
     res.status(isRateLimit(err) ? 429 : 500).json({ error: groqErr(err) });

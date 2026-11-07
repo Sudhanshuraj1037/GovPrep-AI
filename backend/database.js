@@ -22,6 +22,17 @@ db.defaults({
 const dbHelper = {
   prepare(sql) {
     return new Statement(db, sql);
+  },
+  // Minimal, explicit update helper for metadata changes. Predicate runs only against
+  // records in the requested table; callers must include ownership checks where relevant.
+  update(table, predicate, changes) {
+    const rows = db.get(table).value() || [];
+    const index = rows.findIndex(predicate);
+    if (index < 0) return false;
+    const next = [...rows];
+    next[index] = { ...next[index], ...changes };
+    db.set(table, next).write();
+    return true;
   }
 };
 

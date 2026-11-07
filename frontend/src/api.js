@@ -36,6 +36,7 @@ export const getMe = () => req("GET", "/api/auth/me");
 // PDFs
 export const uploadPDF = (formData) => req("POST", "/api/upload", formData, true);
 export const getPDFs = () => req("GET", "/api/pdfs");
+export const confirmPDFSubject = (id, subject) => req("PATCH", `/api/pdfs/${id}/subject`, { subject });
 export const deletePDF = (id) => req("DELETE", `/api/pdfs/${id}`);
 
 // Tests

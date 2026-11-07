@@ -25,6 +25,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--val-size", type=float, default=0.15)
     ap.add_argument("--test-size", type=float, default=0.15)
     ap.add_argument("--min-class-count", type=int, default=5)
+    ap.add_argument("--group-by", default=None,
+                    help="column (e.g. source) whose values must never straddle train/val/test")
     a = ap.parse_args(argv)
     try:
         manifest = prepare_splits(
@@ -34,6 +36,7 @@ def main(argv: list[str] | None = None) -> int:
             val_size=a.val_size,
             test_size=a.test_size,
             min_class_count=a.min_class_count,
+            group_col=a.group_by,
         )
     except (DataNotFoundError, DataValidationError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)

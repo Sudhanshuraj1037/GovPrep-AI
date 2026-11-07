@@ -8,8 +8,7 @@ React (not connected yet)  ->  Node/Express backend (/api/nlp/*, login required)
 
 The backend now proxies the Python NLP service (`nlp_service/`). Everything GovPrep-AI did before is unchanged:
 authentication, PDF upload, question generation, scoring, results and the assistant. The proxy lives in
-`backend/nlp/` and is mounted at `/api/nlp` with four added lines in `backend/server.js`. **The React frontend is not
-changed yet; connecting it is the next phase.**
+`backend/nlp/` and is mounted at `/api/nlp` with four added lines in `backend/server.js`. **The existing React PDF upload and Generate Test screens now use this service for automatic PDF subject detection and confirmation. A separate NLP Lab remains deferred.**
 
 ## What the proxy guarantees
 
@@ -67,9 +66,8 @@ All routes need `Authorization: Bearer <token>` from `/api/auth/login`. `slow` r
 | GET | `/api/nlp/models/comparison` | `/models/comparison` | `?n_bootstrap=`; TF-IDF vs LSTM vs BiLSTM vs BERT; slow |
 | GET | `/api/nlp/models/comparison/rows` | `/models/comparison/rows` | flat rows for tables and charts; slow |
 
-The meaning of each response is documented in `nlp_service/README.md`. Models that are not trained yet answer honestly
-(`status`: `not_trained_yet`); there is no data in this repository to train them with, so expect that until you run the
-training commands in `nlp_service/README.md`.
+The meaning of each response is documented in `nlp_service/README.md`. Models that are not trained or whose checkpoint files are absent answer honestly (`status`: `not_trained_yet`). The source repository intentionally does not commit large trained checkpoints; restore your locally trained artifacts before expecting inference to work.
+
 
 ## Configuration (`backend/.env`)
 
@@ -183,3 +181,30 @@ any file committed earlier; rewriting history (`git filter-repo`) is a separate,
 
 If `backend/govprep-db.json` is currently tracked in your repository (it was on GitHub), run
 `node scripts/repo-hygiene.js fix --apply`, then commit. If real passwords were used for the accounts in it, change them.
+
+
+## Automatic PDF subject detection (Phase 13A)
+
+The existing PDF upload page now supports two modes: `auto` (default in the React UI) and `manual`. In auto mode, Node extracts page text with the existing `pdf-parse` flow, builds up to `NLP_SUBJECT_MAX_CHUNKS` page-aware representative chunks, and sends them to the fixed FastAPI route `POST /classify/bert` using the existing bounded HTTP client. Each chunk is at most `NLP_SUBJECT_CHUNK_CHARS` characters (and always below the classifier's 5,000-character request limit). The current default is eight chunks to keep CPU/RAM use reasonable on a small local machine.
+
+BERT returns four class probabilities for each chunk. Node averages those class probabilities, checks the winning score, runner-up margin, and chunk agreement, and stores a document-level suggestion. These are model scores, not calibrated probabilities. The supported classifier labels are only `History`, `Geography`, `Polity`, and `Science`; other application subjects remain available through manual selection.
+
+An auto-detected subject is stored as `awaiting_confirmation`; question generation returns `409 subject_confirmation_required` until the student confirms or changes it. A low-confidence, mixed-subject, empty-text, missing-model, timeout, or unavailable-service result is stored as `manual_required`. The PDF and extracted page text remain saved; NLP failure never turns a successful PDF extraction into a failed upload. Scanned/image-only PDFs still need OCR, which is not implemented by this flow.
+
+### Subject confirmation API
+
+`PATCH /api/pdfs/:id/subject` (JWT required) accepts `{ "subject": "History" }`. The PDF must belong to the authenticated user, and the subject must be one of the existing application subjects. Confirming the BERT suggestion stores status `confirmed`; choosing another subject (or selecting manually after a failed detection) stores `manual_confirmed`. `GET /api/pdfs` includes `subjectDetectionStatus`, `subjectDetected`, `subjectDetectionModel`, and `subjectDetectionScore`.
+
+### Additional backend settings
+
+| Variable | Default | Meaning |
+|---|---:|---|
+| `NLP_SUBJECT_MAX_CHUNKS` | `8` | Representative chunks per uploaded PDF (1–32). |
+| `NLP_SUBJECT_CHUNK_CHARS` | `1200` | Characters per chunk (250–4500). |
+| `NLP_SUBJECT_OVERLAP_CHARS` | `160` | Overlap between chunks. |
+| `NLP_SUBJECT_MIN_DOCUMENT_CHARS` | `180` | Minimum extracted text before inference is attempted. |
+| `NLP_SUBJECT_MIN_SCORE` | `0.55` | Minimum mean winning class score. |
+| `NLP_SUBJECT_MIN_MARGIN` | `0.10` | Minimum gap over the runner-up class. |
+| `NLP_SUBJECT_MIN_AGREEMENT` | `0.60` | Minimum share of usable chunks voting for the winning class. |
+
+The upload UI and Generate Test page both provide subject confirmation/correction. The existing `/api/generate-questions` endpoint continues to use the saved `pdf.subject` and the selected page text with Groq; BERT classifies the subject and does not generate questions.

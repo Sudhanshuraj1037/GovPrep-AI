@@ -42,3 +42,15 @@
 .secondaryBtn{background:var(--card-bg);color:var(--text-secondary);border:1px solid var(--border-color);padding:11px;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;width:100%}
 .secondaryBtn:hover{background:var(--hover-bg)}
 @media(max-width:480px){.card{padding:16px}.dropZone{padding:28px 12px}}
+
+.detectionCard{text-align:left;background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:var(--radius);padding:14px;margin:0 0 18px}
+.detectionHeading{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:8px}
+.detectionStatus{font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:10px}
+.detectedSubject{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;background:var(--card-bg);border:1px solid var(--border-color);border-radius:var(--radius-sm);margin-bottom:8px}
+.detectedSubject span{font-size:12px;color:var(--text-muted)}
+.detectedSubject strong{font-size:16px;color:var(--green-dark)}
+.detectionMeta{font-size:11px;color:var(--text-muted);margin-top:5px}
+.detectionReason{font-size:12px;line-height:1.5;color:var(--text-secondary);margin:10px 0}
+.subjectConfirmForm{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.readyNote{font-size:12px;font-weight:600;color:var(--green-dark);padding:9px 0 0}
+.fieldNote{font-size:11px;color:var(--text-muted);line-height:1.5;text-align:center}

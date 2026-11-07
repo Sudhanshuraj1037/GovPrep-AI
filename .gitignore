@@ -1,3 +1,4 @@
+
 # Dependencies
 node_modules/
 
@@ -48,3 +49,17 @@ venv/
 *.safetensors
 *.ckpt
 *.onnx
+
+
+# NLP local environment and downloaded files
+nlp_service/.venv311/
+nlp_service/data/raw/
+nlp_service/govprep_bert_bundle.zip
+
+# Local training outputs and temporary archives
+nlp_service/__pycache__/
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3

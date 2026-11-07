@@ -32,7 +32,8 @@ pre-trained API.
 | 5 | PyTorch BiLSTM classifier + metrics + API + cross-model metrics contract | **code done and tested; model NOT trained yet (no dataset present)** |
 | 6 | BERT fine-tuning (Transformers + PyTorch) + metrics + API, on the shared metrics contract | **code done and tested; model NOT trained yet (no dataset, and no pretrained weights downloadable in the dev sandbox)** |
 | 7 | Model comparison (TF-IDF vs LSTM vs BiLSTM vs BERT): aligned tables, rankings, bootstrap intervals, report export, API | **code done and tested; nothing to compare until the models are trained** |
-| 8+ | Node proxy, React UI, PDF pipeline, final regression | not started |
+| 8 | Node proxy integration | implemented; see backend tests |
+| 13A | PDF text → BERT subject detection → subject confirmation → Groq question generation | implementation added; run end-to-end Windows verification |
 
 **No trained model, embedding or metric ships with the repo.** They are produced only by
 running the training command on real data. Until then every classification

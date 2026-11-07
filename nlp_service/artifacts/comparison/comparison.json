@@ -1,0 +1,346 @@
+{
+  "status": "ok",
+  "models_found": [
+    "tfidf",
+    "lstm",
+    "bilstm",
+    "bert"
+  ],
+  "models_missing": [],
+  "problems": {},
+  "parameters": {
+    "rank_by": "f1_macro",
+    "n_bootstrap": 1000,
+    "seed": 42,
+    "alpha": 0.05,
+    "interval": "95% percentile bootstrap, unpaired"
+  },
+  "split_identity": {
+    "files_sha256_equal": true,
+    "manifest_equal": true,
+    "models_with_file_checksums": [
+      "bert",
+      "bilstm",
+      "lstm"
+    ],
+    "models_with_manifest": [
+      "bert",
+      "bilstm",
+      "lstm",
+      "tfidf"
+    ],
+    "models_without_evidence": []
+  },
+  "warnings": [],
+  "summary": [
+    {
+      "target": "subject",
+      "split": "test",
+      "best_model": "bert",
+      "f1_macro": 0.9324024511101004,
+      "tied_for_best": [
+        "bert"
+      ],
+      "models_compared": 4,
+      "separated_from_runner_up": false
+    }
+  ],
+  "targets": {
+    "subject": {
+      "val": {
+        "n": 268,
+        "labels": [
+          "Geography",
+          "History",
+          "Polity",
+          "Science"
+        ],
+        "majority_class_accuracy": 0.2835820895522388,
+        "models": [
+          {
+            "model": "bert",
+            "n": 268,
+            "accuracy": 0.9514925373134329,
+            "precision_macro": 0.956869214796044,
+            "recall_macro": 0.9464944398812156,
+            "f1_macro": 0.9506506730307884,
+            "precision_weighted": 0.9535566282198972,
+            "recall_weighted": 0.9514925373134329,
+            "f1_weighted": 0.9515532264106359,
+            "ci": {
+              "accuracy": [
+                0.9253731343283582,
+                0.9739738805970148
+              ],
+              "f1_macro": [
+                0.9241544617703725,
+                0.9748808860557796
+              ],
+              "f1_weighted": [
+                0.9257473100665079,
+                0.9741811943536122
+              ]
+            },
+            "trainable_parameters": 109485316,
+            "checkpoint_available": true,
+            "trained_at": "2026-11-03T17:59:48.223878+00:00",
+            "rank_f1_macro": 1,
+            "accuracy_minus_majority_baseline": 0.6679104477611941,
+            "f1_macro_minus_tfidf": 0.03924670118564011
+          },
+          {
+            "model": "tfidf",
+            "n": 268,
+            "accuracy": 0.9104477611940298,
+            "precision_macro": 0.9108669011082694,
+            "recall_macro": 0.9131974895221248,
+            "f1_macro": 0.9114039718451483,
+            "precision_weighted": 0.9112361784428242,
+            "recall_weighted": 0.9104477611940298,
+            "f1_weighted": 0.9101722158438577,
+            "ci": {
+              "accuracy": [
+                0.8768656716417911,
+                0.9402985074626866
+              ],
+              "f1_macro": [
+                0.8783464394037253,
+                0.9411782881856805
+              ],
+              "f1_weighted": [
+                0.8767241860352435,
+                0.9404144719836522
+              ]
+            },
+            "trainable_parameters": null,
+            "checkpoint_available": true,
+            "trained_at": "2026-11-03T11:01:10.407111+00:00",
+            "rank_f1_macro": 2,
+            "accuracy_minus_majority_baseline": 0.6268656716417911,
+            "f1_macro_minus_tfidf": null
+          },
+          {
+            "model": "bilstm",
+            "n": 268,
+            "accuracy": 0.8731343283582089,
+            "precision_macro": 0.8722906541533992,
+            "recall_macro": 0.8761151829152714,
+            "f1_macro": 0.8723796333201513,
+            "precision_weighted": 0.8767132995988718,
+            "recall_weighted": 0.8731343283582089,
+            "f1_weighted": 0.8730753241047604,
+            "ci": {
+              "accuracy": [
+                0.832089552238806,
+                0.9104477611940298
+              ],
+              "f1_macro": [
+                0.8295827701991547,
+                0.9111327029347183
+              ],
+              "f1_weighted": [
+                0.8330104302669085,
+                0.9107898933754944
+              ]
+            },
+            "trainable_parameters": 118514,
+            "checkpoint_available": true,
+            "trained_at": "2026-11-03T12:26:53.419537+00:00",
+            "rank_f1_macro": 3,
+            "accuracy_minus_majority_baseline": 0.5895522388059702,
+            "f1_macro_minus_tfidf": -0.03902433852499698
+          },
+          {
+            "model": "lstm",
+            "n": 268,
+            "accuracy": 0.8582089552238806,
+            "precision_macro": 0.8579186662157046,
+            "recall_macro": 0.854765327183505,
+            "f1_macro": 0.8558353387990772,
+            "precision_weighted": 0.8604557535959975,
+            "recall_weighted": 0.8582089552238806,
+            "f1_weighted": 0.8587724946492165,
+            "ci": {
+              "accuracy": [
+                0.8171641791044776,
+                0.8955223880597015
+              ],
+              "f1_macro": [
+                0.8097369639481169,
+                0.8949368246301859
+              ],
+              "f1_weighted": [
+                0.8171920627122228,
+                0.8960720202091291
+              ]
+            },
+            "trainable_parameters": 107634,
+            "checkpoint_available": true,
+            "trained_at": "2026-11-03T12:24:16.335019+00:00",
+            "rank_f1_macro": 4,
+            "accuracy_minus_majority_baseline": 0.5746268656716418,
+            "f1_macro_minus_tfidf": -0.05556863304607107
+          }
+        ],
+        "best_by_f1_macro": "bert",
+        "tied_for_best": [
+          "bert"
+        ],
+        "separated_from_runner_up": false,
+        "excluded": {},
+        "skipped_target": {}
+      },
+      "test": {
+        "n": 268,
+        "labels": [
+          "Geography",
+          "History",
+          "Polity",
+          "Science"
+        ],
+        "majority_class_accuracy": 0.2873134328358209,
+        "models": [
+          {
+            "model": "bert",
+            "n": 268,
+            "accuracy": 0.9328358208955224,
+            "precision_macro": 0.9388104407359863,
+            "recall_macro": 0.9278306057836975,
+            "f1_macro": 0.9324024511101004,
+            "precision_weighted": 0.9346081617818249,
+            "recall_weighted": 0.9328358208955224,
+            "f1_weighted": 0.9329492489496924,
+            "ci": {
+              "accuracy": [
+                0.9029850746268657,
+                0.9626865671641791
+              ],
+              "f1_macro": [
+                0.9004270267158819,
+                0.9614406334074177
+              ],
+              "f1_weighted": [
+                0.9026536998785778,
+                0.9625527297216029
+              ]
+            },
+            "trainable_parameters": 109485316,
+            "checkpoint_available": true,
+            "trained_at": "2026-11-03T17:59:48.223878+00:00",
+            "rank_f1_macro": 1,
+            "accuracy_minus_majority_baseline": 0.6455223880597015,
+            "f1_macro_minus_tfidf": 0.07301347335615527
+          },
+          {
+            "model": "bilstm",
+            "n": 268,
+            "accuracy": 0.8694029850746269,
+            "precision_macro": 0.86987510700746,
+            "recall_macro": 0.868322672352523,
+            "f1_macro": 0.8690451007471919,
+            "precision_weighted": 0.8697063820253021,
+            "recall_weighted": 0.8694029850746269,
+            "f1_weighted": 0.8695045449216765,
+            "ci": {
+              "accuracy": [
+                0.8283582089552238,
+                0.9067164179104478
+              ],
+              "f1_macro": [
+                0.8265693956720468,
+                0.9062426632962066
+              ],
+              "f1_weighted": [
+                0.8285614796437537,
+                0.9069040902631222
+              ]
+            },
+            "trainable_parameters": 118514,
+            "checkpoint_available": true,
+            "trained_at": "2026-11-03T12:26:53.419537+00:00",
+            "rank_f1_macro": 2,
+            "accuracy_minus_majority_baseline": 0.582089552238806,
+            "f1_macro_minus_tfidf": 0.009656122993246696
+          },
+          {
+            "model": "tfidf",
+            "n": 268,
+            "accuracy": 0.8656716417910447,
+            "precision_macro": 0.8667103847188593,
+            "recall_macro": 0.8561493091130618,
+            "f1_macro": 0.8593889777539452,
+            "precision_weighted": 0.867296738663422,
+            "recall_weighted": 0.8656716417910447,
+            "f1_weighted": 0.8644431266780938,
+            "ci": {
+              "accuracy": [
+                0.8208955223880597,
+                0.9067164179104478
+              ],
+              "f1_macro": [
+                0.8106080442732044,
+                0.9003746266874807
+              ],
+              "f1_weighted": [
+                0.8178686655870244,
+                0.9054044461328119
+              ]
+            },
+            "trainable_parameters": null,
+            "checkpoint_available": true,
+            "trained_at": "2026-11-03T11:01:10.407111+00:00",
+            "rank_f1_macro": 3,
+            "accuracy_minus_majority_baseline": 0.5783582089552238,
+            "f1_macro_minus_tfidf": null
+          },
+          {
+            "model": "lstm",
+            "n": 268,
+            "accuracy": 0.835820895522388,
+            "precision_macro": 0.8354976938257779,
+            "recall_macro": 0.8316842503622888,
+            "f1_macro": 0.8330629411189021,
+            "precision_weighted": 0.8357564731323476,
+            "recall_weighted": 0.835820895522388,
+            "f1_weighted": 0.8352444825069842,
+            "ci": {
+              "accuracy": [
+                0.7909514925373133,
+                0.8769589552238806
+              ],
+              "f1_macro": [
+                0.7842638907439097,
+                0.8775257907459423
+              ],
+              "f1_weighted": [
+                0.7878412339644079,
+                0.877172393903567
+              ]
+            },
+            "trainable_parameters": 107634,
+            "checkpoint_available": true,
+            "trained_at": "2026-11-03T12:24:16.335019+00:00",
+            "rank_f1_macro": 4,
+            "accuracy_minus_majority_baseline": 0.5485074626865671,
+            "f1_macro_minus_tfidf": -0.02632603663504307
+          }
+        ],
+        "best_by_f1_macro": "bert",
+        "tied_for_best": [
+          "bert"
+        ],
+        "separated_from_runner_up": false,
+        "excluded": {},
+        "skipped_target": {}
+      }
+    }
+  },
+  "generalisation_gap": {},
+  "notes": [
+    "Every number comes from a real metrics.json; models that are not trained are absent, never estimated.",
+    "Intervals are unpaired bootstrap intervals computed from each model's confusion matrix. 'Separated' means the best model's interval lies entirely above the runner-up's (a conservative rule); overlapping intervals mean the data do not establish a difference. Per-example predictions are not stored, so no paired test is claimed.",
+    "Models are compared on a (target, split) only if they were scored on the same rows and classes.",
+    "pdf_heldout is the domain-shift evaluation (GovPrep-AI PDF text, never used for training or tuning). A gap between test and pdf_heldout is a finding, not an error.",
+    "trainable_parameters are not directly comparable across families (TF-IDF has none in this sense); BiLSTM has about twice the recurrent parameters of an LSTM trained with the same flags."
+  ]
+}

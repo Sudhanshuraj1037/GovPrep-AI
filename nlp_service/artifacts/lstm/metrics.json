@@ -1,0 +1,403 @@
+{
+  "model": "lstm",
+  "description": "LSTM text classifier (PyTorch), one model per target",
+  "trained_at": "2026-11-03T12:24:16.335019+00:00",
+  "seed": 42,
+  "framework": {
+    "torch": "2.15.0+cpu",
+    "device": "cpu",
+    "deterministic_algorithms_requested": true
+  },
+  "data": {
+    "rows": {
+      "train": 1248,
+      "val": 268,
+      "test": 268
+    },
+    "split_files_sha256": {
+      "public_train": "4c8f2811efb27d9be87f4746691db1cff2ca487c2e1f09fee7ad31389d0afca1",
+      "public_val": "6e21eb04dc1ba89bae878e038bcb893d62a844120915b1f5fd803d46f522670a",
+      "public_test": "4e0189f36273781ba95fbc7da4db7380d6aa888557d08cec7678fc7bca305a80"
+    },
+    "pdf_heldout_evaluated": false,
+    "split_manifest": {
+      "created_at": "2026-11-03T10:40:36.207197+00:00",
+      "public_input": {
+        "file": "questions.csv",
+        "sha256": "2c0e6304d2041109b47f35ac3220aa9ba31b7d2b7034f43083f9775ee565c693",
+        "rows_read": 1784,
+        "dropped_empty_text": 0,
+        "dropped_missing_subject": 0,
+        "rows_kept": 1784,
+        "duplicate_rows_dropped": 0,
+        "conflicting_label_rows_dropped": 0
+      },
+      "split": {
+        "seed": 11,
+        "stratified_on": "subject",
+        "val_size": 0.15,
+        "test_size": 0.15,
+        "min_class_count": 5,
+        "grouped_by": null,
+        "dropped_small_classes": {},
+        "sizes": {
+          "train": 1248,
+          "val": 268,
+          "test": 268
+        },
+        "class_counts": {
+          "train": {
+            "Geography": 349,
+            "History": 357,
+            "Polity": 315,
+            "Science": 227
+          },
+          "val": {
+            "Geography": 75,
+            "History": 76,
+            "Polity": 68,
+            "Science": 49
+          },
+          "test": {
+            "Geography": 75,
+            "History": 77,
+            "Polity": 67,
+            "Science": 49
+          }
+        }
+      },
+      "pdf_heldout": null
+    },
+    "encoding": {
+      "train": {
+        "rows": 1248,
+        "tokens": 20965,
+        "unk_rate": 0.13026472692582877,
+        "empty_after_preprocessing": 0,
+        "truncated_rows": 0
+      },
+      "val": {
+        "rows": 268,
+        "tokens": 4454,
+        "unk_rate": 0.21374045801526717,
+        "empty_after_preprocessing": 0,
+        "truncated_rows": 0
+      },
+      "test": {
+        "rows": 268,
+        "tokens": 4338,
+        "unk_rate": 0.21599815583218074,
+        "empty_after_preprocessing": 0,
+        "truncated_rows": 0
+      }
+    }
+  },
+  "preprocessing": {
+    "lowercase": true,
+    "strip_urls_emails": true,
+    "strip_page_markers": true,
+    "remove_stopwords": false,
+    "keep_negations": true,
+    "normalizer": "none",
+    "min_token_len": 2
+  },
+  "hyperparameters": {
+    "embedding_dim": 50,
+    "hidden_dim": 32,
+    "num_layers": 1,
+    "dropout": 0.3,
+    "max_len": 64,
+    "min_freq": 2,
+    "max_vocab": 5000,
+    "batch_size": 8,
+    "epochs": 10,
+    "lr": 0.001,
+    "weight_decay": 0.0,
+    "grad_clip": 1.0,
+    "patience": 3,
+    "class_weights": true,
+    "init_embeddings": "word2vec",
+    "w2v_variant": "skipgram",
+    "freeze_embeddings": false,
+    "device": "cpu"
+  },
+  "vocabulary": {
+    "size": 1935,
+    "min_freq": 2,
+    "max_vocab": 5000,
+    "built_from": "public_train"
+  },
+  "embeddings": {
+    "init": "word2vec",
+    "variant": "skipgram",
+    "dimension": 50,
+    "words_covered": 1792,
+    "vocabulary_words": 1933,
+    "coverage": 0.9270563890325918,
+    "word2vec_trained_at": "2026-11-03T11:19:02.448432+00:00",
+    "word2vec_corpus_sha256": "4c8f2811efb27d9be87f4746691db1cff2ca487c2e1f09fee7ad31389d0afca1"
+  },
+  "targets": {
+    "subject": {
+      "status": "trained",
+      "labels": [
+        "Geography",
+        "History",
+        "Polity",
+        "Science"
+      ],
+      "n_train": 1248,
+      "model": {
+        "vocab_size": 1935,
+        "embedding_dim": 50,
+        "hidden_dim": 32,
+        "num_layers": 1,
+        "num_classes": 4,
+        "dropout": 0.3,
+        "pad_idx": 0,
+        "bidirectional": false,
+        "trainable_parameters": 107634,
+        "total_parameters": 107634
+      },
+      "training": {
+        "epochs_run": 10,
+        "best_epoch": 9,
+        "stopped_early": false,
+        "model_selection": "best validation macro-F1",
+        "validation_rows_used": 268,
+        "validation_rows_ignored_unseen_label": 0,
+        "class_weights": [
+          0.8939828276634216,
+          0.8739495873451233,
+          0.9904761910438538,
+          1.374449372291565
+        ],
+        "train_seconds": 15.664,
+        "history": [
+          {
+            "epoch": 1,
+            "train_loss": 1.2317076825942748,
+            "val_loss": 0.9782269597053528,
+            "val_accuracy": 0.5858209133148193,
+            "val_f1_macro": 0.5675424436273038
+          },
+          {
+            "epoch": 2,
+            "train_loss": 0.8606138812043728,
+            "val_loss": 0.8659292459487915,
+            "val_accuracy": 0.6567164063453674,
+            "val_f1_macro": 0.6638698846365734
+          },
+          {
+            "epoch": 3,
+            "train_loss": 0.6775860616411918,
+            "val_loss": 0.7998905181884766,
+            "val_accuracy": 0.7201492786407471,
+            "val_f1_macro": 0.7211489379765574
+          },
+          {
+            "epoch": 4,
+            "train_loss": 0.5236599190781513,
+            "val_loss": 0.5875796675682068,
+            "val_accuracy": 0.8059701323509216,
+            "val_f1_macro": 0.808165847876155
+          },
+          {
+            "epoch": 5,
+            "train_loss": 0.4071233834689244,
+            "val_loss": 0.5900568962097168,
+            "val_accuracy": 0.8022388219833374,
+            "val_f1_macro": 0.8010158465902084
+          },
+          {
+            "epoch": 6,
+            "train_loss": 0.32681837340052694,
+            "val_loss": 0.5923175811767578,
+            "val_accuracy": 0.8022388219833374,
+            "val_f1_macro": 0.7991815706344745
+          },
+          {
+            "epoch": 7,
+            "train_loss": 0.23304360444681385,
+            "val_loss": 0.5644186735153198,
+            "val_accuracy": 0.8283582329750061,
+            "val_f1_macro": 0.8275135543099614
+          },
+          {
+            "epoch": 8,
+            "train_loss": 0.16107983749885207,
+            "val_loss": 0.5898540019989014,
+            "val_accuracy": 0.8208954930305481,
+            "val_f1_macro": 0.8187000085891283
+          },
+          {
+            "epoch": 9,
+            "train_loss": 0.1502078137187383,
+            "val_loss": 0.47863420844078064,
+            "val_accuracy": 0.858208954334259,
+            "val_f1_macro": 0.8558353387990772
+          },
+          {
+            "epoch": 10,
+            "train_loss": 0.11715518326785129,
+            "val_loss": 0.6933959126472473,
+            "val_accuracy": 0.8097015023231506,
+            "val_f1_macro": 0.8100202516471491
+          }
+        ]
+      },
+      "splits": {
+        "val": {
+          "n": 268,
+          "accuracy": 0.8582089552238806,
+          "precision_macro": 0.8579186662157046,
+          "recall_macro": 0.854765327183505,
+          "f1_macro": 0.8558353387990772,
+          "precision_weighted": 0.8604557535959975,
+          "recall_weighted": 0.8582089552238806,
+          "f1_weighted": 0.8587724946492165,
+          "per_class": {
+            "Geography": {
+              "precision": 0.9027777777777778,
+              "recall": 0.8666666666666667,
+              "f1": 0.8843537414965986,
+              "support": 75
+            },
+            "History": {
+              "precision": 0.8048780487804879,
+              "recall": 0.868421052631579,
+              "f1": 0.8354430379746836,
+              "support": 76
+            },
+            "Polity": {
+              "precision": 0.9076923076923077,
+              "recall": 0.8676470588235294,
+              "f1": 0.8872180451127819,
+              "support": 68
+            },
+            "Science": {
+              "precision": 0.8163265306122449,
+              "recall": 0.8163265306122449,
+              "f1": 0.8163265306122449,
+              "support": 49
+            }
+          },
+          "confusion_matrix": {
+            "labels": [
+              "Geography",
+              "History",
+              "Polity",
+              "Science"
+            ],
+            "matrix": [
+              [
+                65,
+                7,
+                1,
+                2
+              ],
+              [
+                3,
+                66,
+                3,
+                4
+              ],
+              [
+                1,
+                5,
+                59,
+                3
+              ],
+              [
+                3,
+                4,
+                2,
+                40
+              ]
+            ]
+          },
+          "unseen_label_rows": 0,
+          "majority_class_baseline": {
+            "class": "History",
+            "accuracy": 0.2835820895522388
+          }
+        },
+        "test": {
+          "n": 268,
+          "accuracy": 0.835820895522388,
+          "precision_macro": 0.8354976938257779,
+          "recall_macro": 0.8316842503622888,
+          "f1_macro": 0.8330629411189021,
+          "precision_weighted": 0.8357564731323476,
+          "recall_weighted": 0.835820895522388,
+          "f1_weighted": 0.8352444825069842,
+          "per_class": {
+            "Geography": {
+              "precision": 0.8395061728395061,
+              "recall": 0.9066666666666666,
+              "f1": 0.8717948717948718,
+              "support": 75
+            },
+            "History": {
+              "precision": 0.8289473684210527,
+              "recall": 0.8181818181818182,
+              "f1": 0.8235294117647058,
+              "support": 77
+            },
+            "Polity": {
+              "precision": 0.84375,
+              "recall": 0.8059701492537313,
+              "f1": 0.8244274809160306,
+              "support": 67
+            },
+            "Science": {
+              "precision": 0.8297872340425532,
+              "recall": 0.7959183673469388,
+              "f1": 0.8125,
+              "support": 49
+            }
+          },
+          "confusion_matrix": {
+            "labels": [
+              "Geography",
+              "History",
+              "Polity",
+              "Science"
+            ],
+            "matrix": [
+              [
+                68,
+                4,
+                2,
+                1
+              ],
+              [
+                6,
+                63,
+                3,
+                5
+              ],
+              [
+                6,
+                5,
+                54,
+                2
+              ],
+              [
+                1,
+                4,
+                5,
+                39
+              ]
+            ]
+          },
+          "unseen_label_rows": 0,
+          "majority_class_baseline": {
+            "class": "History",
+            "accuracy": 0.2873134328358209
+          }
+        }
+      }
+    }
+  }
+}

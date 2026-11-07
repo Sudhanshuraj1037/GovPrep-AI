@@ -1,0 +1,439 @@
+{
+  "model": "tfidf",
+  "description": "TF-IDF (word 1-2 grams) + Logistic Regression, one classifier per target",
+  "trained_at": "2026-11-03T11:01:10.407111+00:00",
+  "seed": 42,
+  "data": {
+    "rows": {
+      "train": 1248,
+      "val": 268,
+      "test": 268
+    },
+    "pdf_heldout_evaluated": false,
+    "split_manifest": {
+      "created_at": "2026-11-03T10:40:36.207197+00:00",
+      "public_input": {
+        "file": "questions.csv",
+        "sha256": "2c0e6304d2041109b47f35ac3220aa9ba31b7d2b7034f43083f9775ee565c693",
+        "rows_read": 1784,
+        "dropped_empty_text": 0,
+        "dropped_missing_subject": 0,
+        "rows_kept": 1784,
+        "duplicate_rows_dropped": 0,
+        "conflicting_label_rows_dropped": 0
+      },
+      "split": {
+        "seed": 11,
+        "stratified_on": "subject",
+        "val_size": 0.15,
+        "test_size": 0.15,
+        "min_class_count": 5,
+        "grouped_by": null,
+        "dropped_small_classes": {},
+        "sizes": {
+          "train": 1248,
+          "val": 268,
+          "test": 268
+        },
+        "class_counts": {
+          "train": {
+            "Geography": 349,
+            "History": 357,
+            "Polity": 315,
+            "Science": 227
+          },
+          "val": {
+            "Geography": 75,
+            "History": 76,
+            "Polity": 68,
+            "Science": 49
+          },
+          "test": {
+            "Geography": 75,
+            "History": 77,
+            "Polity": 67,
+            "Science": 49
+          }
+        }
+      },
+      "pdf_heldout": null
+    }
+  },
+  "preprocessing": {
+    "lowercase": true,
+    "strip_urls_emails": true,
+    "strip_page_markers": true,
+    "remove_stopwords": true,
+    "keep_negations": true,
+    "normalizer": "stem",
+    "min_token_len": 2
+  },
+  "tfidf": {
+    "ngram_range": [
+      1,
+      2
+    ],
+    "min_df": 2,
+    "max_df": 1.0,
+    "sublinear_tf": true,
+    "max_features": 50000,
+    "c_grid": [
+      0.1,
+      1.0,
+      10.0
+    ],
+    "class_weight": "balanced",
+    "max_iter": 1000
+  },
+  "targets": {
+    "subject": {
+      "status": "trained",
+      "labels": [
+        "Geography",
+        "History",
+        "Polity",
+        "Science"
+      ],
+      "n_train": 1248,
+      "vocabulary_size": 2453,
+      "chosen_C": 10.0,
+      "C_selected_on": "validation macro-F1",
+      "C_grid": [
+        {
+          "C": 0.1,
+          "val_f1_macro": 0.895160095913967
+        },
+        {
+          "C": 1.0,
+          "val_f1_macro": 0.9106169512936695
+        },
+        {
+          "C": 10.0,
+          "val_f1_macro": 0.9114039718451483
+        }
+      ],
+      "splits": {
+        "val": {
+          "n": 268,
+          "accuracy": 0.9104477611940298,
+          "precision_macro": 0.9108669011082694,
+          "recall_macro": 0.9131974895221248,
+          "f1_macro": 0.9114039718451483,
+          "precision_weighted": 0.9112361784428242,
+          "recall_weighted": 0.9104477611940298,
+          "f1_weighted": 0.9101722158438577,
+          "per_class": {
+            "Geography": {
+              "precision": 0.927536231884058,
+              "recall": 0.8533333333333334,
+              "f1": 0.8888888888888888,
+              "support": 75
+            },
+            "History": {
+              "precision": 0.8875,
+              "recall": 0.9342105263157895,
+              "f1": 0.9102564102564102,
+              "support": 76
+            },
+            "Polity": {
+              "precision": 0.9264705882352942,
+              "recall": 0.9264705882352942,
+              "f1": 0.9264705882352942,
+              "support": 68
+            },
+            "Science": {
+              "precision": 0.9019607843137255,
+              "recall": 0.9387755102040817,
+              "f1": 0.92,
+              "support": 49
+            }
+          },
+          "confusion_matrix": {
+            "labels": [
+              "Geography",
+              "History",
+              "Polity",
+              "Science"
+            ],
+            "matrix": [
+              [
+                64,
+                5,
+                2,
+                4
+              ],
+              [
+                2,
+                71,
+                3,
+                0
+              ],
+              [
+                3,
+                1,
+                63,
+                1
+              ],
+              [
+                0,
+                3,
+                0,
+                46
+              ]
+            ]
+          },
+          "unseen_label_rows": 0,
+          "majority_class_baseline": {
+            "class": "History",
+            "accuracy": 0.2835820895522388
+          }
+        },
+        "test": {
+          "n": 268,
+          "accuracy": 0.8656716417910447,
+          "precision_macro": 0.8667103847188593,
+          "recall_macro": 0.8561493091130618,
+          "f1_macro": 0.8593889777539452,
+          "precision_weighted": 0.867296738663422,
+          "recall_weighted": 0.8656716417910447,
+          "f1_weighted": 0.8644431266780938,
+          "per_class": {
+            "Geography": {
+              "precision": 0.8571428571428571,
+              "recall": 0.96,
+              "f1": 0.9056603773584906,
+              "support": 75
+            },
+            "History": {
+              "precision": 0.85,
+              "recall": 0.8831168831168831,
+              "f1": 0.8662420382165605,
+              "support": 77
+            },
+            "Polity": {
+              "precision": 0.9152542372881356,
+              "recall": 0.8059701492537313,
+              "f1": 0.8571428571428571,
+              "support": 67
+            },
+            "Science": {
+              "precision": 0.8444444444444444,
+              "recall": 0.7755102040816326,
+              "f1": 0.8085106382978723,
+              "support": 49
+            }
+          },
+          "confusion_matrix": {
+            "labels": [
+              "Geography",
+              "History",
+              "Polity",
+              "Science"
+            ],
+            "matrix": [
+              [
+                72,
+                1,
+                0,
+                2
+              ],
+              [
+                4,
+                68,
+                3,
+                2
+              ],
+              [
+                4,
+                6,
+                54,
+                3
+              ],
+              [
+                4,
+                5,
+                2,
+                38
+              ]
+            ]
+          },
+          "unseen_label_rows": 0,
+          "majority_class_baseline": {
+            "class": "History",
+            "accuracy": 0.2873134328358209
+          }
+        }
+      },
+      "top_terms": {
+        "Geography": [
+          {
+            "term": "geolog",
+            "weight": 4.203079672910171
+          },
+          {
+            "term": "locat",
+            "weight": 3.5918540286725307
+          },
+          {
+            "term": "soil",
+            "weight": 3.5015028197304825
+          },
+          {
+            "term": "river",
+            "weight": 3.4338308982474004
+          },
+          {
+            "term": "specif",
+            "weight": 3.1569925648450035
+          },
+          {
+            "term": "rock",
+            "weight": 2.9593410769452255
+          },
+          {
+            "term": "rang",
+            "weight": 2.787487562937814
+          },
+          {
+            "term": "known",
+            "weight": 2.714132502826879
+          },
+          {
+            "term": "deposit",
+            "weight": 2.6132291898266367
+          },
+          {
+            "term": "indian state",
+            "weight": 2.5726967520827664
+          }
+        ],
+        "History": [
+          {
+            "term": "dynasti",
+            "weight": 3.073025145324833
+          },
+          {
+            "term": "sultan",
+            "weight": 2.9598386969031893
+          },
+          {
+            "term": "ruler",
+            "weight": 2.8132900004137698
+          },
+          {
+            "term": "fort",
+            "weight": 2.7909861840922363
+          },
+          {
+            "term": "mughal",
+            "weight": 2.6687540870650497
+          },
+          {
+            "term": "kingdom",
+            "weight": 2.6251116007810498
+          },
+          {
+            "term": "shivaji",
+            "weight": 2.5848440168853672
+          },
+          {
+            "term": "rule",
+            "weight": 2.5416886750606493
+          },
+          {
+            "term": "bc",
+            "weight": 2.532593040339483
+          },
+          {
+            "term": "site",
+            "weight": 2.4837540114167753
+          }
+        ],
+        "Polity": [
+          {
+            "term": "constitut",
+            "weight": 5.008085274944032
+          },
+          {
+            "term": "elect",
+            "weight": 3.9557762511622485
+          },
+          {
+            "term": "parti",
+            "weight": 3.7205977729571957
+          },
+          {
+            "term": "govern",
+            "weight": 3.4008574413177612
+          },
+          {
+            "term": "state",
+            "weight": 3.347691186677499
+          },
+          {
+            "term": "polit",
+            "weight": 3.0952030206673338
+          },
+          {
+            "term": "protest",
+            "weight": 2.7738194664938316
+          },
+          {
+            "term": "constitu",
+            "weight": 2.7308737458004715
+          },
+          {
+            "term": "court",
+            "weight": 2.728158366622744
+          },
+          {
+            "term": "indian constitut",
+            "weight": 2.7008336613946917
+          }
+        ],
+        "Science": [
+          {
+            "term": "astronom",
+            "weight": 4.090904910120808
+          },
+          {
+            "term": "ce",
+            "weight": 3.380281843786171
+          },
+          {
+            "term": "ayurved",
+            "weight": 3.327689932633781
+          },
+          {
+            "term": "mission",
+            "weight": 2.9645909650134548
+          },
+          {
+            "term": "medicin",
+            "weight": 2.930872291881482
+          },
+          {
+            "term": "astronomi",
+            "weight": 2.7488241042495147
+          },
+          {
+            "term": "did",
+            "weight": 2.733970666673627
+          },
+          {
+            "term": "yantra",
+            "weight": 2.6502561444050476
+          },
+          {
+            "term": "denot",
+            "weight": 2.6014099053526745
+          },
+          {
+            "term": "ayurveda",
+            "weight": 2.5320784674342396
+          }
+        ]
+      }
+    }
+  }
+}

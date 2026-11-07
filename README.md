@@ -51,6 +51,7 @@ Unlike traditional quiz generators, GovPrep AI allows users to create personaliz
 | 🤖 AI Question Generation | ✅ |
 | 💬 AI Study Assistant | ✅ |
 | 📄 PDF Upload | ✅ |
+| 🧠 Automatic PDF Subject Detection (BERT, with manual fallback) | ✅ |
 | 🌐 English → Hindi PDF Translation | ✅ |
 | 📝 Custom Practice Test Generator | ✅ |
 | 📊 Dashboard | ✅ |
@@ -71,6 +72,8 @@ Users can:
 
 - Generate unlimited AI-powered practice tests.
 - Upload study PDFs for better learning.
+- Automatically detect supported PDF subjects with the trained BERT classifier, then confirm or correct the result.
+- Generate practice questions from the selected PDF pages after subject confirmation.
 - Translate English PDFs into Hindi.
 - Practice topic-wise examinations.
 - Review previous test history.
@@ -294,8 +297,7 @@ A complete template is in `backend/.env.example` (copy it to `backend/.env`). It
 
 GovPrep-AI also includes a Python NLP/Deep Learning service (`nlp_service/`: TF-IDF, Word2Vec, LSTM, BiLSTM, BERT and a
 model comparison). The backend proxies it, behind the normal login, at `/api/nlp/*`. It is optional: without
-`NLP_SERVICE_URL` those routes answer `503` and every other feature works exactly as before. The React app does not use
-it yet.
+`NLP_SERVICE_URL` the NLP proxy routes answer `503` and the rest of the application remains available. The PDF upload flow now calls the trained BERT classifier through the Node backend when auto-detection is selected; uncertain results fall back to manual subject selection. The separate NLP Lab remains deferred.
 
 ```bash
 # terminal 1

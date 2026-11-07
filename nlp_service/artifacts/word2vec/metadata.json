@@ -1,0 +1,71 @@
+{
+  "model": "word2vec",
+  "description": "Word2Vec embeddings (CBOW and/or Skip-Gram) trained on the public train split",
+  "trained_at": "2026-11-03T11:19:02.448432+00:00",
+  "seed": 42,
+  "gensim_version": "4.4.0",
+  "preprocessing": {
+    "lowercase": true,
+    "strip_urls_emails": true,
+    "strip_page_markers": true,
+    "remove_stopwords": true,
+    "keep_negations": true,
+    "normalizer": "none",
+    "min_token_len": 2
+  },
+  "word2vec": {
+    "vector_size": 50,
+    "window": 5,
+    "min_count": 2,
+    "negative": 5,
+    "sample": 0.001,
+    "epochs": 30
+  },
+  "corpus": {
+    "source": "public_train",
+    "sha256": "4c8f2811efb27d9be87f4746691db1cff2ca487c2e1f09fee7ad31389d0afca1",
+    "documents": 1248,
+    "tokens": 12402,
+    "documents_per_subject": {
+      "History": 357,
+      "Polity": 315,
+      "Geography": 349,
+      "Science": 227
+    }
+  },
+  "variants": {
+    "cbow": {
+      "architecture": "CBOW",
+      "sg": 0,
+      "vocab_size": 1792,
+      "train_seconds": 0.569
+    },
+    "skipgram": {
+      "architecture": "skip-gram",
+      "sg": 1,
+      "vocab_size": 1792,
+      "train_seconds": 1.083
+    }
+  },
+  "vocabulary_coverage": {
+    "val": {
+      "tokens": 2650,
+      "in_vocabulary": 1714,
+      "coverage": 0.6467924528301887
+    },
+    "test": {
+      "tokens": 2569,
+      "in_vocabulary": 1644,
+      "coverage": 0.6399377189567925
+    }
+  },
+  "variant_comparison": {
+    "words_compared": 200,
+    "k": 10,
+    "mean_jaccard": 0.09394326691540313
+  },
+  "notes": [
+    "Word2Vec is unsupervised: no accuracy/F1 exists for it. Values here are descriptive statistics.",
+    "Trained on public_train only. Coverage on val/test/pdf_heldout is measured after training and never used for training or tuning."
+  ]
+}
