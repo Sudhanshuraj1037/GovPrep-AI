@@ -654,27 +654,47 @@ class BertService:
                     "Re-run training (checkpoints are not committed to git)."
                 )
             try:
-                ckpt = torch.load(f, map_location="cpu", weights_only=True)
+                # Memory-map the checkpoint so its tensors are not eagerly copied
+                # into a second full-size allocation.
+                ckpt = torch.load(
+                    f,
+                    map_location="cpu",
+                    weights_only=True,
+                    mmap=True,
+                )
                 if ckpt["format_version"] != CHECKPOINT_FORMAT or ckpt["target"] != target:
                     raise ValueError("unexpected checkpoint format or target")
                 if ckpt["arch"] != ARCH:
                     raise ValueError(f"this is a '{ckpt['arch']}' checkpoint, expected '{ARCH}'")
+
                 spec = dict(ckpt["model_config"])
                 check_tokenizer_fits_model(tokenizer, spec.get("vocab_size"))
                 config = AutoConfig.for_model(spec.pop("model_type"), **spec)
-                with _quiet_transformers():
-                    model = AutoModelForSequenceClassification.from_config(config)
-                model.float()
-                model.load_state_dict(ckpt["state_dict"], strict=True)   # wrong architecture -> clear error
+
+                # Construct parameters on the meta device to avoid allocating
+                # random initial weights before attaching the checkpoint tensors.
+                with torch.device("meta"):
+                    with _quiet_transformers():
+                        model = AutoModelForSequenceClassification.from_config(config)
+
+                # assign=True attaches the checkpoint tensors instead of copying
+                # them into separately allocated parameter storage.
+                model.load_state_dict(
+                    ckpt["state_dict"],
+                    strict=True,
+                    assign=True,
+                )
+                model.eval()
+                models[target] = {
+                    "model": model,
+                    "labels": list(ckpt["labels"]),
+                    "max_len": int(ckpt["max_len"]),
+                    "clean_text": bool(ckpt["clean_text"]),
+                }
+                del ckpt
+                gc.collect()
             except Exception as exc:
                 raise BertNotTrainedError(f"could not load checkpoint {f.name}: {exc}") from exc
-            model.eval()
-            models[target] = {
-                "model": model,
-                "labels": list(ckpt["labels"]),
-                "max_len": int(ckpt["max_len"]),
-                "clean_text": bool(ckpt["clean_text"]),
-            }
         return cls(tokenizer, models, metrics)
 
     def predict(self, texts: Sequence[str], top_k: int = 3) -> list[dict[str, Any]]:
