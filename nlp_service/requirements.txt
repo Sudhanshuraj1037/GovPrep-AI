@@ -26,3 +26,5 @@ torch>=2.2
 # /classify/bert need it. Tested with transformers 5.19; the default checkpoint is downloaded from the
 # Hugging Face Hub on first use (internet needed) unless --pretrained points to a local directory.
 transformers>=4.40
+
+huggingface_hub>=0.30

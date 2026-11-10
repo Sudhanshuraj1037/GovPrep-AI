@@ -1,15 +1,13 @@
+
 """FastAPI entry point for the GovPrep-AI NLP/DL service.
 
 Phase 1: service skeleton + /health.
 Phase 2: /preprocess, /classify/tfidf, /models/tfidf/metrics.
-Phase 3: /models/word2vec/* (status, similar, similarity, analogy, vector, visualize).
-Phase 4: /models/lstm/status, /models/lstm/metrics, /classify/lstm (PyTorch is imported lazily).
-Phase 5: the same three endpoints for the BiLSTM (/models/bilstm/status, /models/bilstm/metrics, /classify/bilstm).
-Phase 6: the same three endpoints for BERT (/models/bert/status, /models/bert/metrics, /classify/bert).
-Phase 7: /models/comparison and /models/comparison/rows (TF-IDF vs LSTM vs BiLSTM vs BERT, from real metrics only).
-Later phases add preprocessing, TF-IDF, Word2Vec, LSTM, BiLSTM and BERT
-endpoints as separate routers; the Node/Express backend is the only intended
-client (React never calls this service directly), so CORS is deliberately off.
+Phase 3: /models/word2vec/* endpoints.
+Phase 4: LSTM endpoints.
+Phase 5: BiLSTM endpoints.
+Phase 6: BERT endpoints.
+Phase 7: Model comparison endpoints.
 
 Run from the nlp_service/ folder:
     python -m uvicorn app.main:app --port 8001 --reload
@@ -17,12 +15,14 @@ Run from the nlp_service/ folder:
 from __future__ import annotations
 
 import logging
+import os
 import platform
 import time
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 
 from fastapi import FastAPI
+from huggingface_hub import snapshot_download
 
 from . import __version__
 from .api_bert import router as bert_router
@@ -35,10 +35,70 @@ from .config import settings
 from .labels import DIFFICULTIES, SUBJECTS
 from .registry import dataset_status, dependency_status, model_status
 
+
 logging.basicConfig(level=settings.log_level.upper())
 log = logging.getLogger("govprep.nlp")
 
 _STARTED = time.time()
+
+
+def download_bert_artifacts():
+    """Download private BERT artifacts if they are not already available."""
+
+    repo_id = os.getenv(
+        "HF_MODEL_REPO",
+        "sudhanshuraj1037/govprep-bert-artifacts",
+    )
+
+    target_dir = settings.artifacts_dir / "bert"
+    target_dir.mkdir(parents=True, exist_ok=True)
+
+    required_files = [
+        target_dir / "subject.pt",
+        target_dir / "metrics.json",
+        target_dir / "tokenizer" / "tokenizer.json",
+        target_dir / "tokenizer" / "tokenizer_config.json",
+    ]
+
+    # Local development: reuse existing artifacts without requiring a token.
+    if all(file.is_file() for file in required_files):
+        log.info("BERT artifacts already available.")
+        return
+
+    # Production: download missing artifacts from the private Hugging Face repo.
+    token = os.getenv("HF_TOKEN")
+
+    if not token:
+        raise RuntimeError(
+            "HF_TOKEN is missing. Cannot access private BERT repository."
+        )
+
+    log.info("Downloading BERT artifacts from Hugging Face: %s", repo_id)
+
+    snapshot_download(
+        repo_id=repo_id,
+        repo_type="model",
+        token=token,
+        local_dir=str(target_dir),
+        allow_patterns=[
+            "subject.pt",
+            "metrics.json",
+            "tokenizer/*",
+        ],
+    )
+
+    missing = [
+        str(file)
+        for file in required_files
+        if not file.is_file()
+    ]
+
+    if missing:
+        raise RuntimeError(
+            f"BERT artifact download incomplete. Missing: {missing}"
+        )
+
+    log.info("BERT artifacts downloaded and verified.")
 
 
 @asynccontextmanager
@@ -46,7 +106,11 @@ async def lifespan(_: FastAPI):
     log.info("GovPrep-AI NLP service v%s starting", __version__)
     log.info("artifacts dir: %s", settings.artifacts_dir)
     log.info("data dir:      %s", settings.data_dir)
+
+    download_bert_artifacts()
+
     yield
+
     log.info("GovPrep-AI NLP service stopped")
 
 
@@ -74,7 +138,9 @@ app.include_router(word2vec_router)
 @app.get("/health", tags=["System"])
 def health() -> dict:
     """Liveness + honest status of what is installed, trained and available."""
+
     models = model_status()
+
     return {
         "status": "ok",
         "service": "govprep-nlp-service",
@@ -83,7 +149,10 @@ def health() -> dict:
         "uptime_seconds": round(time.time() - _STARTED, 1),
         "python": platform.python_version(),
         "random_seed": settings.random_seed,
-        "labels": {"subjects": SUBJECTS, "difficulties": DIFFICULTIES},
+        "labels": {
+            "subjects": SUBJECTS,
+            "difficulties": DIFFICULTIES,
+        },
         "models": models,
         "models_trained": sum(m["trained"] for m in models),
         "datasets": dataset_status(),
