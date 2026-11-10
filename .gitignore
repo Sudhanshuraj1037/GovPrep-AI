@@ -63,3 +63,7 @@ nlp_service/__pycache__/
 *.db
 *.sqlite
 *.sqlite3
+
+# Experimental ML artifacts and datasets
+nlp_service/artifacts/experiments/
+nlp_service/data/experiments/

@@ -27,7 +27,11 @@ export default function GenerateTest({ navigate, pdfs, refreshPdfs }) {
 
   const selected = pdfs.find(p => p.id === selectedPdf);
   const selectedStatus = pdfOverrides[selectedPdf]?.subjectDetectionStatus || selected?.subjectDetectionStatus;
-  const subjectNeedsConfirmation = selected && ['awaiting_confirmation', 'manual_required'].includes(selectedStatus);
+  // const subjectNeedsConfirmation = selected && ['awaiting_confirmation', 'manual_required'].includes(selectedStatus);
+  const subjectNeedsConfirmation = Boolean(
+    selected &&
+    !['confirmed', 'manual_confirmed'].includes(selectedStatus)
+  );
 
   const handleConfirmSubject = async () => {
     if (!selectedPdf || !pendingSubject) return;
@@ -55,8 +59,8 @@ export default function GenerateTest({ navigate, pdfs, refreshPdfs }) {
     setGenerating(true); setError('');
     setStep(`Reading PDF content from pages ${ps}–${pe}…`);
     try {
-      setTimeout(() => setStep('Groq AI analyzing PDF content and creating questions…'), 1500);
-      setTimeout(() => setStep('Verifying questions against source material…'), 4000);
+      // setTimeout(() => setStep('Groq AI analyzing PDF content and creating questions…'), 1500);
+      // setTimeout(() => setStep('Verifying questions against source material…'), 4000);
       const data = await generateQuestions({ pdfId: selectedPdf, pageStart: ps, pageEnd: pe, questionCount: parseInt(questionCount) || 10, difficulty, examTemplate: template, questionTypes: ['MCQ'], language });
       setGenerating(false);
       navigate('take-test', { testId: data.testId, questions: data.questions, examTemplate: template, meta: data.meta, templateConfig: TEMPLATES.find(t => t.name === template) || TEMPLATES[0] });
@@ -94,9 +98,9 @@ export default function GenerateTest({ navigate, pdfs, refreshPdfs }) {
                   <div className={styles.pdfOptionInfo}>
                     <div className={styles.pdfOptionName}>{p.name.length > 50 ? p.name.slice(0, 50) + '…' : p.name}</div>
                     <div className={styles.pdfOptionMeta}>{pdfOverrides[p.id]?.subject || p.subject} · {p.chapter} · <strong>{p.totalPages} pages</strong></div>
-                  {['awaiting_confirmation', 'manual_required'].includes(pdfOverrides[p.id]?.subjectDetectionStatus || p.subjectDetectionStatus) && (
-                    <div className={styles.fieldNote}>Subject confirmation required.</div>
-                  )}
+                    {['awaiting_confirmation', 'manual_required'].includes(pdfOverrides[p.id]?.subjectDetectionStatus || p.subjectDetectionStatus) && (
+                      <div className={styles.fieldNote}>Subject confirmation required.</div>
+                    )}
                   </div>
                   {selectedPdf === p.id && <div className={styles.checkmark}>✓</div>}
                 </div>
@@ -116,7 +120,7 @@ export default function GenerateTest({ navigate, pdfs, refreshPdfs }) {
                 </div>
                 <label className={styles.label}>Subject</label>
                 <select className={styles.select} value={pendingSubject} onChange={e => setPendingSubject(e.target.value)}>
-                  {['History','Geography','Mathematics','Science','Reasoning','General Awareness','English','Economics','Polity','Current Affairs','Other'].map(s => <option key={s} value={s}>{s}</option>)}
+                  {['History', 'Geography', 'Mathematics', 'Science', 'Reasoning', 'General Awareness', 'English', 'Economics', 'Polity', 'Current Affairs', 'Other'].map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
                 <button className={styles.primaryBtn} onClick={handleConfirmSubject} disabled={savingSubject}>
                   {savingSubject ? 'Saving subject…' : 'Confirm subject'}
@@ -228,13 +232,13 @@ export default function GenerateTest({ navigate, pdfs, refreshPdfs }) {
               <div className={styles.genText}>{step || 'Generating questions…'}</div>
               <div className={styles.genSub}>This takes 10–30 seconds. Please wait…</div>
             </div>
-          // ) : (
-          //   <button className={styles.generateBtn} onClick={handleGenerate} disabled={!selectedPdf || subjectNeedsConfirmation}>
-          //     ✦ Generate Questions & Start Test
-          //   </button>
-          //   {subjectNeedsConfirmation && <div className={styles.fieldNote}>Confirm the subject above before generating a test.</div>}
-          // )}
-          
+            // ) : (
+            //   <button className={styles.generateBtn} onClick={handleGenerate} disabled={!selectedPdf || subjectNeedsConfirmation}>
+            //     ✦ Generate Questions & Start Test
+            //   </button>
+            //   {subjectNeedsConfirmation && <div className={styles.fieldNote}>Confirm the subject above before generating a test.</div>}
+            // )}
+
           ) : (
             <>
               <button

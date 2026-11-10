@@ -81,9 +81,13 @@ async function startGroqStub() {
     let content;
     if (isGeneration) content = state.mode === "bad_json" ? "this is definitely not json" : JSON.stringify(state.questions);
     else content = state.reply;
-    return { body: { id: "chatcmpl-stub", object: "chat.completion", created: 0, model: req.body?.model || "stub",
-      choices: [{ index: 0, message: { role: "assistant", content }, finish_reason: "stop" }],
-      usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 } } };
+    return {
+      body: {
+        id: "chatcmpl-stub", object: "chat.completion", created: 0, model: req.body?.model || "stub",
+        choices: [{ index: 0, message: { role: "assistant", content }, finish_reason: "stop" }],
+        usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 }
+      }
+    };
   });
   stub.state = state;
   return stub;
@@ -121,7 +125,8 @@ async function startBackend({ env = {}, sourceDir = SOURCE_DIR, groqUrl } = {}) 
     JWT_SECRET: "test-secret-not-a-real-secret",
     GROQ_API_KEY: "test-key-not-real",
     ...(groqUrl ? { TEST_GROQ_BASE_URL: groqUrl } : {}),
-    NODE_OPTIONS: `--require "${PRELOAD}"`,
+    // NODE_OPTIONS: `--require "${PRELOAD}"`,
+    NODE_OPTIONS: `--require "${PRELOAD.replace(/\\/g, "/")}"`,
     ...env,
   };
   for (const k of Object.keys(childEnv)) if (childEnv[k] === undefined) delete childEnv[k];
@@ -135,7 +140,7 @@ async function startBackend({ env = {}, sourceDir = SOURCE_DIR, groqUrl } = {}) 
 
   const url = `http://127.0.0.1:${port}`;
   const deadline = Date.now() + 20000;
-  for (;;) {
+  for (; ;) {
     if (exited) throw new Error(`backend exited during start-up:\n${out.join("")}`);
     try { if ((await fetch(`${url}/api/health`)).ok) break; } catch { /* not up yet */ }
     if (Date.now() > deadline) { child.kill(); throw new Error(`backend did not start:\n${out.join("")}`); }

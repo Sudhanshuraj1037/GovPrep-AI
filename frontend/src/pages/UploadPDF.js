@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { uploadPDF, confirmPDFSubject } from '../api';
 import styles from './UploadPDF.module.css';
 
-const SUBJECTS = ['History','Geography','Mathematics','Science','Reasoning','General Awareness','English','Economics','Polity','Current Affairs','Other'];
+const SUBJECTS = ['History', 'Geography', 'Mathematics', 'Science', 'Reasoning', 'General Awareness', 'English', 'Economics', 'Polity', 'Current Affairs', 'Other'];
 
 const statusLabel = (status) => ({
   awaiting_confirmation: 'Subject detected — confirmation required',
@@ -87,7 +87,10 @@ export default function UploadPDF({ navigate, onUpload }) {
     }
   };
 
-  const canGenerate = result && ['confirmed', 'manual_confirmed'].includes(result.subjectDetectionStatus || 'manual_confirmed');
+  const canGenerate = Boolean(
+    result &&
+    ['confirmed', 'manual_confirmed'].includes(result.subjectDetectionStatus || 'manual_confirmed')
+  );
 
   if (result) return (
     <div className={styles.page}>
@@ -156,7 +159,7 @@ export default function UploadPDF({ navigate, onUpload }) {
         >
           <input ref={fileRef} type="file" accept=".pdf,application/pdf" style={{ display: 'none' }} onChange={e => handleFile(e.target.files[0])} />
           {file ? (
-            <><div className={styles.fileIcon}>📄</div><div className={styles.fileName}>{file.name}</div><div className={styles.fileSize}>{(file.size/1024/1024).toFixed(2)} MB · Click to change</div></>
+            <><div className={styles.fileIcon}>📄</div><div className={styles.fileName}>{file.name}</div><div className={styles.fileSize}>{(file.size / 1024 / 1024).toFixed(2)} MB · Click to change</div></>
           ) : (
             <><div className={styles.uploadIcon}>☁️</div><div className={styles.dropTitle}>Drop PDF here or click to browse</div><div className={styles.dropSub}>PDF files up to 50MB · Text-based PDFs work best</div></>
           )}
