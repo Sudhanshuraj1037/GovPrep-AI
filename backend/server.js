@@ -195,7 +195,15 @@ app.post("/api/upload", requireAuth, upload.single("pdf"), async (req, res) => {
     let detection;
 
     if (subjectMode === "auto") {
-      detection = await detectDocumentSubject(pageTexts);
+      // detection = await detectDocumentSubject(pageTexts);/
+      detection = await detectDocumentSubject(
+        pageTexts,
+        process.env,
+        {
+          filename: req.file.originalname,
+          chapter: chapter
+        }
+      );
       if (detection.status === "awaiting_confirmation" && APPLICATION_SUBJECTS.has(detection.detectedSubject)) {
         subject = detection.detectedSubject;
       } else {
